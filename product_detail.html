@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết sản phẩm</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: Segoe UI,Arial,sans-serif;
+            background: #f9fbfd;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 36px auto;
+            background: #fff;
+            padding: 40px 34px 32px 34px;
+            border-radius: 12px;
+            box-shadow: 0 2px 14px #e3e8f8;
+        }
+
+        .prod-head {
+            display: flex;
+            gap: 36px;
+            align-items: flex-start;
+        }
+
+        .prod-img {
+            width: 260px;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 9px;
+            box-shadow: 0 2px 8px #ecebfa;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .prod-title {
+            font-weight: 700;
+            font-size: 28px;
+            margin-top: 0;
+        }
+
+        .prod-owner {
+            color: #1862c5;
+            font-weight: 500;
+            margin-top: 7px;
+        }
+
+        .prod-meta {
+            margin: 7px 0 17px 0;
+            color: #525d72;
+        }
+
+        .prod-desc {
+            font-size: 17px;
+            line-height: 1.7;
+            margin: 19px 0 0 0;
+        }
+
+        .prod-actions {
+            margin-top: 33px;
+        }
+
+        .cart-btn {
+            background: #1976d2;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 7px;
+            padding: 13px 44px;
+            cursor: pointer;
+        }
+
+            .cart-btn:hover {
+                background: #1152a2;
+            }
+
+        /* Review & Rating CSS */
+        .review-box {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+        }
+
+        .review-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .review-average {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+
+        .stars i {
+            font-size: 26px;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+            .stars i.active {
+                color: #ff9800;
+            }
+
+        .review-input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .review-btn {
+            margin-top: 14px;
+            padding: 10px 26px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .review-item {
+            margin-top: 20px;
+            padding: 12px 16px;
+            background: #f4f7ff;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .review-stars i {
+            color: #ff9800;
+            font-size: 18px;
+        }
+
+        .review-delete {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            cursor: pointer;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="detailContainer">
+        <!-- Nội dung sản phẩm sẽ được JS điền -->
+    </div>
+
+    <script>
+        // Dữ liệu demo
+        const allItems = [
+            {
+                id: "1",
+                name: "Laptop dell",
+                img: "https://i.pinimg.com/736x/a7/6c/4b/a76c4babfdab739579551c478c46e52c.jpg",
+                owner: "Nguyễn Văn hải",
+                price: 100000,
+                desc: "Laptop Dell chính hãng, cấu hình mạnh mẽ i5-1135G7, RAM 16GB, SSD 512GB. Bảo hành, sử dụng văn phòng, lập trình, thiết kế mượt mà.",
+                status: "Đang cho thuê",
+                rentdate: "05/12/2025"
+            },
+            {
+                id: "2",
+                name: "Balo thể thao",
+                img: "https://i.pinimg.com/736x/44/93/96/44939623956f7e83b821ee851005e38a.jpg",
+                owner: "Trần anh quân",
+                price: 20000,
+                desc: "Balo thể thao bền đẹp, đựng được laptop, quần áo, thích hợp đi học, du lịch.",
+                status: "Đang trống",
+                rentdate: "06/12/2025"
+            },
+            {
+                id: "3",
+                name: "sách kỹ năng mềm",
+                img: "https://i.pinimg.com/736x/6f/d6/44/6fd644e267361cb38cf32b272a7b89c5.jpg",
+                owner: "Trần thị ngọc ánh ",
+                price: 100000,
+                desc: "Váy dự tiệc dáng dài, thiết kế sang trọng, chất liệu voan lụa mềm, thoáng nhẹ và tạo độ bay khi di chuyển. Form chuẩn, tôn dáng, phù hợp đi tiệc, sự kiện, sinh nhật hoặc chụp ảnh. Màu sắc thanh lịch, đường may chắc chắn, tạo cảm giác thoải mái khi mặc.",
+                status: "Đang cho thuê",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "4",
+                name: "Áo cử nhân tốt nghiệp",
+                img: "https://i.pinimg.com/736x/c9/b4/5e/c9b45e826b0d8658fbc02540dc376bfa.jpg",
+                owner: "Huỳnh Tấn Phát ",
+                price: 50000,
+                desc: "Áo cử nhân cho sinh thuê thuê dự lễ tốt nghiệp đủ size đủ màu",
+                status: "Đang cho thuê/còn",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "5",
+                name: "Giáo trình Cấu trúc dữ liệu",
+                img: "https://i.pinimg.com/736x/9a/a8/d1/9aa8d1f956818f1d8188aeb3b5cc799f.jpg",
+                owner: "Võ Xuân Vũ",
+                price: 20000,
+                desc: "Giáo trình môn cấu trúc dữ liệu danh cho sinh viên IT .",
+                status: "Đang cho thuê/còn",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "6",
+                name: "máy ảnh cannon",
+                img: "https://i.pinimg.com/736x/c5/3c/9d/c53c9de66be127dc8e505dd1855ea712.jpg",
+                owner: "Phạm Thị Hải Yến",
+                price: 100000,
+                desc: " cọc cccd Canon là thương hiệu máy ảnh Nhật Bản nổi tiếng, cho chất lượng ảnh đẹp, màu sắc trung thực, lấy nét nhanh và nhiều dòng máy phù hợp từ người mới đến chuyên nghiệp..",
+                status: "Đang cho thuê/còn",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "7",
+                name: "giáo trình speaking level 1, 2, 3",
+                img: "https://i.pinimg.com/736x/9c/4c/dd/9c4cddcc5357e0105eb1ca05776b7234.jpg",
+                owner: "Trần thị ngọc ánh ",
+                price: 20000,
+                desc: "giáo trình tiếng anh nói cho sinh viên các ngành .",
+                status: "Đang cho thuê",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "8",
+                name: "đầm dạ hội",
+                img: "https://i.pinimg.com/736x/a7/5b/a6/a75ba6bc4f09e6159253e59f74d5803f.jpg",
+                owner: "Trần thị ngọc ánh ",
+                price: 100000,
+                desc: "Váy dự tiệc dáng dài, thiết kế sang trọng, chất liệu voan lụa mềm, thoáng nhẹ và tạo độ bay khi di chuyển. Form chuẩn, tôn dáng, phù hợp đi tiệc, sự kiện, sinh nhật hoặc chụp ảnh. Màu sắc thanh lịch, đường may chắc chắn, tạo cảm giác thoải mái khi mặc.",
+                status: "Đang cho thuê",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "9",
+                name: "áo dài nam nữ ",
+                img: "https://i.pinimg.com/736x/5e/ab/08/5eab083116e29aea1027104ceb5cd977.jpg",
+                owner: "Đỗ Long ",
+                price: 50000,
+                desc: "✨ Áo dài truyền thống thiết kế sang trọng, phù hợp dịp lễ tết, sự kiện, chụp ảnh kỷ yếu, đám cưới hỏi.✔ Chất liệu: Lụa cao cấp, mềm mịn, thoáng mát✔ Kiểu dáng: Form đứng đẹp, tôn dáng✔ Màu sắc: Đa dạng(đỏ, trắng, xanh, vàng…)✔ Size: Đủ size nam – nữ(S → XXL)✔ Phụ kiện kèm: Quần lụa + dây buộc✔ Tình trạng: Mới 95–100 %, giặt hấp sạch sẽ✔ Thích hợp: Sự kiện, lễ hội, chụp ảnh, dự tiệc, ngày Tết.",
+                status: "Đang cho thuê/còn",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "10",
+                name: "mô tô Yzamaha-2018 ",
+                img: "https://i.pinimg.com/736x/0d/49/53/0d4953fb435bc43f93e20e863bcc2288.jpg",
+                owner: "Phan Duy Khoa  ",
+                price: 200000,
+                desc: "🏍️ Yamaha 2018 – Mạnh mẽ, bền bỉ, thiết kế thể thao Xe Yamaha đời 2018 sở hữu kiểu dáng thể thao, động cơ bền bỉ và hiệu suất vận hành ổn định.",
+                status: "Đang cho thuê",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "11",
+                name: "đầm dạ hội coslay",
+                img: "https://i.pinimg.com/736x/bf/4b/91/bf4b912c56413f4716bdcb3a60b7c380.jpg",
+                owner: "Trần Thị Thu Thủy ",
+                price: 150000,
+                desc: "👗✨ Đầm Dạ Hội Cosplay – Sang Trọng, Lộng Lẫy, Nổi Bật Đầm dạ hội cosplay phong cách fantasy với thiết kế bồng bềnh – sang – nổi bật.",
+                status: "Đang trống ",
+                rentdate: "07/12/2025"
+            },
+            {
+                id: "12",
+                name: "Đàn Gita",
+                img: "https://i.pinimg.com/736x/09/a5/cb/09a5cb84345bdbf6ab31b106cad74977.jpg",
+                owner: "Trần thị ngọc ánh ",
+                price: 50000,
+                desc: "Đàn guitar gỗ thiết kế đơn giản, bền, phù hợp cho người mới học lẫn chơi giải trí ✔ Âm thanh trầm ấm, vang tốt✔ Cần đàn dễ bấm, dây êm tay ✔ Thích hợp tập chơi, biểu diễn nhẹ, thu âm cơ bản ✔ Hình thức đẹp, màu gỗ tự nhiênPhù hợp học sinh – sinh viên – người mới bắt đầu.",
+                status: "Đang cho thuê/còn",
+                rentdate: "07/12/2025"
+            },
+            // Bạn có thể thêm các sản phẩm khác
+        ];
+
+        // Lấy id sản phẩm từ URL
+        function getParam(name) {
+            let url = new URL(window.location.href);
+            return url.searchParams.get(name)
+        }
+        const prodId = getParam("id") || "1"; // mặc định id=1
+        const item = allItems.find(i => i.id == prodId);
+
+        if (item) {
+            document.getElementById("detailContainer").innerHTML = `
+                <div class="prod-head">
+                    <img class="prod-img" src="${item.img}" alt="">
+                    <div class="info">
+                        <h1 class="prod-title">${item.name}</h1>
+                        <div class="prod-owner"><i class="fa fa-user"></i> Chủ: ${item.owner}</div>
+                        <div class="prod-meta">
+                            <i class="fa fa-tag"></i> Giá thuê: <b style="color:#d41212; font-size:20px">${item.price.toLocaleString()} VNĐ</b>
+                            <br><i class="fa fa-calendar"></i> Đang thuê đến: <b>${item.rentdate}</b>
+                            <br><i class="fa fa-info-circle"></i> <b>${item.status}</b>
+                        </div>
+                        <div class="prod-desc">${item.desc}</div>
+                        <div class="prod-actions">
+                            <button class="cart-btn" onclick="addToCart('${item.id}')"><i class="fa fa-cart-plus"></i> Thêm vào giỏ</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review & Rating -->
+                <div class="review-box">
+                    <div class="review-title">Đánh giá & Bình luận</div>
+                    <div class="review-average" id="reviewAverage">Chưa có đánh giá</div>
+
+                    <div class="stars" id="rateStars">
+                        <i class="fa fa-star" data-star="1"></i>
+                        <i class="fa fa-star" data-star="2"></i>
+                        <i class="fa fa-star" data-star="3"></i>
+                        <i class="fa fa-star" data-star="4"></i>
+                        <i class="fa fa-star" data-star="5"></i>
+                    </div>
+
+                    <textarea id="reviewText" class="review-input" rows="3" placeholder="Nhập bình luận của bạn..."></textarea>
+                    <button class="review-btn" onclick="addReview()">Gửi đánh giá</button>
+
+                    <div id="reviewList"></div>
+                </div>
+                `;
+        } else {
+            document.getElementById("detailContainer").innerHTML = `<h3>Không tìm thấy sản phẩm.</h3>`;
+        }
+
+        // Thêm vào giỏ hàng
+        function addToCart(id) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.some(i => i.id == id)) {
+                alert("Sản phẩm đã có trong giỏ!");
+                return;
+            }
+            const prod = allItems.find(i => i.id == id);
+            cart.push({ id: prod.id, name: prod.name, img: prod.img, price: prod.price });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Đã thêm vào giỏ!');
+        }
+
+        // Review & Rating JS
+        let selectedStars = 0;
+
+        document.addEventListener("click", function () {
+            document.querySelectorAll("#rateStars i").forEach(star => {
+                star.addEventListener("click", function () {
+                    selectedStars = this.getAttribute("data-star");
+                    document.querySelectorAll("#rateStars i").forEach(s => s.classList.remove("active"));
+                    for (let i = 0; i < selectedStars; i++) {
+                        document.querySelectorAll("#rateStars i")[i].classList.add("active");
+                    }
+                });
+            });
+        });
+
+        function loadReviews() {
+            const list = JSON.parse(localStorage.getItem("reviews_" + prodId) || "[]");
+            let html = "";
+
+            if (list.length === 0) {
+                document.getElementById("reviewAverage").textContent = "Chưa có đánh giá";
+            } else {
+                const avg = (list.reduce((sum, r) => sum + Number(r.stars), 0) / list.length).toFixed(1);
+                document.getElementById("reviewAverage").textContent = `Đánh giá trung bình: ${avg} / 5 (${list.length} đánh giá)`;
+            }
+
+            list.forEach((r, idx) => {
+                html += `
+                    <div class="review-item">
+                        <div class="review-stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+                        <div>${r.text}</div>
+                        <div class="review-delete" onclick="deleteReview(${idx})">Xóa</div>
+                    </div>
+                    `;
+            });
+
+            document.getElementById("reviewList").innerHTML = html;
+        }
+
+        function addReview() {
+            const text = document.getElementById("reviewText").value.trim();
+            if (!text || selectedStars == 0) {
+                alert("Vui lòng chọn số sao và nhập bình luận!");
+                return;
+            }
+
+            const list = JSON.parse(localStorage.getItem("reviews_" + prodId) || "[]");
+            list.push({ stars: Number(selectedStars), text: text });
+            localStorage.setItem("reviews_" + prodId, JSON.stringify(list));
+
+            document.getElementById("reviewText").value = "";
+            selectedStars = 0;
+            document.querySelectorAll("#rateStars i").forEach(s => s.classList.remove("active"));
+
+            loadReviews();
+        }
+
+        function deleteReview(idx) {
+            if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
+            const list = JSON.parse(localStorage.getItem("reviews_" + prodId) || "[]");
+            list.splice(idx, 1);
+            localStorage.setItem("reviews_" + prodId, JSON.stringify(list));
+            loadReviews();
+        }
+
+        loadReviews();
+    </script>
+</body>
+</html>

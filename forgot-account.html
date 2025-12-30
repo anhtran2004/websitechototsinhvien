@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quên mật khẩu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef3fa;
+        }
+
+        .panel {
+            background: #fff;
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 28px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px #dde0ee;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1976d2;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 14px;
+            border-radius: 5px;
+            border: 1px solid #bbc6e0;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #409EFF;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .msg {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <h2>Quên mật khẩu</h2>
+
+        <input id="username" placeholder="Tên đăng nhập">
+        <input id="email" placeholder="Email đã đăng ký">
+        <input id="newpass" type="password" placeholder="Mật khẩu mới">
+
+        <button onclick="resetPass()">Đặt lại mật khẩu</button>
+
+        <div class="msg" id="msg"></div>
+
+        <a href="login.html">← Quay lại đăng nhập</a>
+    </div>
+
+    <script>
+        function resetPass() {
+            const u = document.getElementById("username").value.trim();
+            const e = document.getElementById("email").value.trim();
+            const np = document.getElementById("newpass").value.trim();
+            const msg = document.getElementById("msg");
+
+            msg.textContent = "";
+
+            if (!u || !e || !np) {
+                msg.style.color = "red";
+                msg.textContent = "Vui lòng nhập đầy đủ thông tin!";
+                return;
+            }
+
+            let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+            const idx = accounts.findIndex(a => a.username === u && a.email === e);
+
+            if (idx !== -1) {
+                accounts[idx].password = np;
+                localStorage.setItem("accounts", JSON.stringify(accounts));
+                msg.style.color = "green";
+                msg.textContent = "Đặt lại mật khẩu thành công!";
+            } else {
+                msg.style.color = "red";
+                msg.textContent = "Thông tin không chính xác!";
+            }
+        }
+    </script>
+
+</body>
+</html>

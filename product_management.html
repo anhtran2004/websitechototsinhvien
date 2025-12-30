@@ -1,0 +1,490 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Quản Lý Sản Phẩm — Thêm Ảnh (HTML)</title>
+    <style>
+        :root {
+            --blue: #1976d2;
+            --yellow: #ffca28;
+            --red: #e53935;
+            --muted: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #222;
+            --accent: #f0f4f8;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(180deg,#f7f9fb 0%, #fff 100%);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 18px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 6px 22px rgba(25, 40, 60, 0.06);
+        }
+
+        h1 {
+            margin: 0 0 14px 0;
+            font-size: 28px;
+        }
+
+        form.row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+            form.row input[type="text"],
+            form.row input[type="number"],
+            form.row select {
+                padding: 10px 12px;
+                border-radius: 6px;
+                border: 1px solid #e1e6eb;
+                min-width: 160px;
+                font-size: 14px;
+            }
+
+        .file-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px dashed #d6dfe9;
+            background: #fafcff;
+        }
+
+            .file-wrapper input[type="file"] {
+                cursor: pointer;
+            }
+
+        .preview {
+            width: 96px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e6edf3;
+            background: #f6f8fb;
+        }
+
+        button.primary {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button.ghost {
+            background: transparent;
+            border: 1px solid #e1e6eb;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eef3f7;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: var(--accent);
+            font-weight: 700;
+        }
+
+        td .thumb {
+            width: 96px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e6edf3;
+        }
+
+        .actions button {
+            margin-right: 6px;
+        }
+
+        .btn-yellow {
+            background: var(--yellow);
+            border: none;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-red {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .muted {
+            color: #6b7680;
+            font-size: 13px;
+        }
+
+        .message {
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+            .message.success {
+                background: #e6f4ea;
+                color: #0f6b2f;
+            }
+
+            .message.error {
+                background: #fdecea;
+                color: #9d2b2b;
+            }
+
+        @media (max-width: 720px) {
+            .preview, .thumb {
+                width: 72px;
+                height: 56px;
+            }
+
+            form.row {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <h1>Quản Lý Sản Phẩm — Thêm Ảnh</h1>
+
+        <div id="notice" aria-live="polite"></div>
+
+        <form id="productForm" class="row" autocomplete="off">
+            <input id="name" name="name" type="text" placeholder="Tên sản phẩm" required />
+            <input id="owner" name="owner" type="text" placeholder="Chủ sở hữu" required />
+            <input id="price" name="price" type="number" placeholder="Giá (VND)" required min="0" />
+            <select id="status" name="status">
+                <option value="Sẵn sàng">Sẵn sàng</option>
+                <option value="Đang cho thuê">Đang cho thuê</option>
+            </select>
+
+            <label class="file-wrapper">
+                <input id="image" name="image" type="file" accept="image/*" />
+                <span class="muted">Chọn ảnh</span>
+            </label>
+
+            <img id="preview" class="preview" alt="preview" style="display:none;" />
+
+            <button id="submitBtn" class="primary" type="submit">Thêm</button>
+            <button id="clearBtn" class="ghost" type="button">Clear</button>
+        </form>
+
+        <table id="productsTable" aria-label="Danh sách sản phẩm">
+            <thead>
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Tên</th>
+                    <th>Chủ</th>
+                    <th>Giá</th>
+                    <th>Trạng thái</th>
+                    <th style="width:160px">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- rows injected here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    // product-management.html
+    // - Thử gửi POST tới /api/products (multipart/form-data).
+    // - Nếu backend không tồn tại / trả lỗi, script sẽ fallback lưu product vào localStorage
+    //   (kèm image dưới dạng data URL) để bạn có demo frontend hoạt động độc lập.
+    // - Xóa sẽ gọi DELETE /api/products/:id nếu server hỗ trợ; nếu không, chỉ xóa localStorage.
+
+    const form = document.getElementById('productForm');
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('preview');
+    const tableBody = document.getElementById('tableBody');
+    const notice = document.getElementById('notice');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const LS_KEY = 'pm_products_v1';
+
+    function showMessage(text, type = 'success') {
+      notice.innerHTML = '<div class="message ' + (type === 'error' ? 'error' : 'success') + '">' + text + '</div>';
+      setTimeout(() => { notice.innerHTML = ''; }, 3500);
+    }
+
+    // preview selected image
+    imageInput.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) {
+        preview.style.display = 'none';
+        preview.src = '';
+        return;
+      }
+      const url = URL.createObjectURL(f);
+      preview.src = url;
+      preview.style.display = 'inline-block';
+    });
+
+    // helpers - localStorage fallback
+    function loadLocalProducts() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    }
+    function saveLocalProducts(arr) {
+      localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    }
+
+    // render table
+    function renderProducts(products) {
+      tableBody.innerHTML = '';
+      products.forEach(p => {
+        const tr = document.createElement('tr');
+
+        const tdImg = document.createElement('td');
+        if (p.imageUrl) {
+          const img = document.createElement('img');
+          img.className = 'thumb';
+          img.src = p.imageUrl;
+          img.alt = p.name || 'Ảnh';
+          tdImg.appendChild(img);
+        } else {
+          const placeholder = document.createElement('div');
+          placeholder.style.width = '96px';
+          placeholder.style.height = '72px';
+          placeholder.style.background = '#f1f5f8';
+          placeholder.style.borderRadius = '6px';
+          placeholder.style.display = 'flex';
+          placeholder.style.alignItems = 'center';
+          placeholder.style.justifyContent = 'center';
+          placeholder.textContent = 'No image';
+          tdImg.appendChild(placeholder);
+        }
+
+        const tdName = document.createElement('td'); tdName.textContent = p.name || '';
+        const tdOwner = document.createElement('td'); tdOwner.textContent = p.owner || '';
+        const tdPrice = document.createElement('td'); tdPrice.textContent = p.price != null ? p.price : '';
+        const tdStatus = document.createElement('td'); tdStatus.textContent = p.status || '';
+
+        const tdActions = document.createElement('td');
+        tdActions.className = 'actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn-yellow';
+        btnEdit.textContent = 'Sửa';
+        btnEdit.addEventListener('click', () => {
+          // simple inline edit: fill form with product and remove from list (on submit update)
+          document.getElementById('name').value = p.name || '';
+          document.getElementById('owner').value = p.owner || '';
+          document.getElementById('price').value = p.price || '';
+          document.getElementById('status').value = p.status || 'Sẵn sàng';
+          // cannot set file input programmatically for security; keep existing image visible
+          if (p.imageUrl) {
+            preview.src = p.imageUrl;
+            preview.style.display = 'inline-block';
+          }
+          // remove original entry so that submitting creates updated one
+          deleteProductById(p.id || p._id, true);
+        });
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn-red';
+        btnDelete.textContent = 'Xóa';
+        btnDelete.addEventListener('click', () => {
+          if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+          deleteProductById(p.id || p._id);
+        });
+
+        tdActions.appendChild(btnEdit);
+        tdActions.appendChild(btnDelete);
+
+        tr.appendChild(tdImg);
+        tr.appendChild(tdName);
+        tr.appendChild(tdOwner);
+        tr.appendChild(tdPrice);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdActions);
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // load from server or local
+    async function fetchProducts() {
+      try {
+        const res = await fetch('/api/products', { method: 'GET' });
+        if (!res.ok) throw new Error('No server or non-200 status');
+        const data = await res.json();
+        // ensure imageUrl is absolute if needed
+        const host = `${location.protocol}//${location.host}`;
+        const normalized = data.map(d => {
+          if (d.imageUrl && d.imageUrl.startsWith('/')) d.imageUrl = host + d.imageUrl;
+          return d;
+        });
+        renderProducts(normalized);
+        // also sync to localStorage for offline preview convenience (store small subset)
+        saveLocalProducts(normalized.map(p => ({
+          id: p._id || p.id,
+          name: p.name, owner: p.owner, price: p.price, status: p.status, imageUrl: p.imageUrl
+        })));
+      } catch (err) {
+        console.warn('Fetch products failed, falling back to localStorage', err);
+        const local = loadLocalProducts();
+        renderProducts(local);
+      }
+    }
+
+    // delete helper: try server, otherwise local
+    async function deleteProductById(id, silentRemoveOnly = false) {
+      // try server delete
+      if (!id) {
+        // nothing to do: remove first matching from local
+        const local = loadLocalProducts();
+        local.shift();
+        saveLocalProducts(local);
+        renderProducts(local);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/products/' + encodeURIComponent(id), { method: 'DELETE' });
+        if (res.ok) {
+          showMessage('Đã xóa sản phẩm trên server');
+          await fetchProducts();
+          return;
+        }
+        throw new Error('Server delete failed');
+      } catch (err) {
+        // fallback to local
+        const local = loadLocalProducts();
+        const filtered = local.filter(p => (p.id || p._id || p._id) !== id);
+        saveLocalProducts(filtered);
+        renderProducts(filtered);
+        if (!silentRemoveOnly) showMessage('Đã xóa sản phẩm (offline)', 'success');
+      }
+    }
+
+    // submit handler: attempt to POST to server, otherwise save local (with base64 dataUrl image)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Đang gửi...';
+      const name = document.getElementById('name').value.trim();
+      const owner = document.getElementById('owner').value.trim();
+      const price = Number(document.getElementById('price').value);
+      const status = document.getElementById('status').value;
+      const file = imageInput.files && imageInput.files[0];
+
+      // If server exists, try to send FormData
+      let sentToServer = false;
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('owner', owner);
+        formData.append('price', price);
+        formData.append('status', status);
+        if (file) formData.append('image', file);
+
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) throw new Error('Server responded ' + res.status);
+        const created = await res.json();
+        // normalize imageUrl to absolute if startsWith '/'
+        if (created.imageUrl && created.imageUrl.startsWith('/')) {
+          created.imageUrl = location.protocol + '//' + location.host + created.imageUrl;
+        }
+        // prepend into UI
+        const current = loadLocalProducts();
+        const newItem = {
+          id: created._id || created.id,
+          name: created.name, owner: created.owner, price: created.price, status: created.status, imageUrl: created.imageUrl
+        };
+        saveLocalProducts([newItem, ...current]);
+        renderProducts([newItem, ...current]);
+        showMessage('Đã gửi lên server thành công');
+        sentToServer = true;
+      } catch (err) {
+        console.warn('Gửi tới server thất bại, lưu local', err);
+      }
+
+      if (!sentToServer) {
+        // fallback: read file as dataURL and save to localStorage
+        const reader = file ? new FileReader() : null;
+        reader && reader.addEventListener('load', () => {
+          const imageUrl = reader.result; // data:image/...
+          const local = loadLocalProducts();
+          const id = 'local_' + Date.now() + '-' + Math.floor(Math.random() * 1e6);
+          const item = { id, name, owner, price, status, imageUrl };
+          saveLocalProducts([item, ...local]);
+          renderProducts([item, ...local]);
+          showMessage('Server offline — đã lưu tạm vào trình duyệt', 'error');
+        });
+        if (reader) {
+          reader.readAsDataURL(file);
+        } else {
+          const local = loadLocalProducts();
+          const id = 'local_' + Date.now() + '-' + Math.floor(Math.random() * 1e6);
+          const item = { id, name, owner, price, status, imageUrl: '' };
+          saveLocalProducts([item, ...local]);
+          renderProducts([item, ...local]);
+          showMessage('Server offline — đã lưu tạm vào trình duyệt', 'error');
+        }
+      }
+
+      // reset form (except preview if user wants to keep it when editing)
+      form.reset();
+      preview.style.display = 'none';
+      preview.src = '';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Thêm';
+    });
+
+    clearBtn.addEventListener('click', () => {
+      form.reset();
+      preview.style.display = 'none';
+      preview.src = '';
+    });
+
+    // init
+    fetchProducts();
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký tài khoản | Chợ thuê đồ SV</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef3fa;
+            margin: 0;
+        }
+
+        .register-panel {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 28px 32px;
+            max-width: 400px;
+            margin: 60px auto 0 auto;
+            box-shadow: 0 2px 10px #dde0ee;
+        }
+
+        .panel-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 22px;
+            color: #1976d2;
+            margin-bottom: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+            .form-group label {
+                display: block;
+                font-weight: bold;
+                margin-bottom: 8px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 10px 8px;
+                border-radius: 5px;
+                border: 1px solid #bbc6e0;
+                font-size: 15px;
+            }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            color: #fff;
+            background: #409EFF;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background: #005bbb;
+            }
+
+        .msg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            text-align: center;
+            margin-top: 14px;
+        }
+
+            .nav-link a {
+                color: #1976d2;
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="register-panel">
+        <h2 class="panel-title">Đăng ký tài khoản</h2>
+
+        <div class="form-group">
+            <label>Tên đăng nhập</label>
+            <input id="user" type="text" placeholder="Nhập tên đăng nhập">
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input id="email" type="email" placeholder="Nhập email">
+        </div>
+
+        <div class="form-group">
+            <label>Số điện thoại</label>
+            <input id="phone" type="text" placeholder="Nhập số điện thoại">
+        </div>
+
+        <div class="form-group">
+            <label>Mật khẩu</label>
+            <input id="pass" type="password" placeholder="Nhập mật khẩu">
+        </div>
+
+        <button class="btn" onclick="reg()">Đăng ký</button>
+
+        <div class="msg" id="regMsg"></div>
+
+        <div class="nav-link">
+            <a href="login.html">Quay lại đăng nhập</a>
+        </div>
+    </div>
+
+    <script>
+        function reg() {
+            const u = user.value.trim();
+            const e = email.value.trim();
+            const ph = phone.value.trim();
+            const p = pass.value.trim();
+            const msg = document.getElementById("regMsg");
+            msg.textContent = "";
+
+            if (!u || !e || !ph || !p) {
+                msg.textContent = "Vui lòng nhập đầy đủ thông tin!";
+                return;
+            }
+
+            // Lấy danh sách account
+            let acc = JSON.parse(localStorage.getItem("accounts")) || [];
+
+            // Kiểm tra trùng tên đăng nhập
+            if (acc.find(a => a.username === u)) {
+                msg.textContent = "Tên đăng nhập đã tồn tại!";
+                return;
+            }
+
+            acc.push({
+                username: u,
+                email: e,
+                phone: ph,
+                password: p
+            });
+
+            localStorage.setItem("accounts", JSON.stringify(acc));
+
+            msg.style.color = "#15803D";
+            msg.textContent = "Đăng ký thành công! Đang chuyển sang trang đăng nhập...";
+
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1200);
+        }
+    </script>
+
+</body>
+</html>

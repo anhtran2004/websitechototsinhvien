@@ -1,0 +1,206 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Đơn hàng của tôi | Chợ thuê đồ SV</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root { --primary:#1976d2; --muted:#6b7280; --bg:#f5f7ff; --success:#1aa34a; --warning:#f59e0b; --danger:#da0037; }
+    body { font-family: "Segoe UI", Arial, sans-serif; background:var(--bg); margin:0; padding:20px; }
+    .wrap { max-width:1100px; margin:0 auto; background:#fff; border-radius:12px; padding:18px; box-shadow:0 8px 30px rgba(16,24,40,0.06); }
+    .head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .title { font-weight:700; color:var(--primary); }
+    .small { color:var(--muted); font-size:13px; }
+    .controls { display:flex; gap:8px; align-items:center; }
+    .filter-btn { background:#eef3ff; color:var(--primary); border:1px solid #dbe9fb; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+    .filter-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .orders { margin-top:16px; display:flex; flex-direction:column; gap:12px; }
+    .order { border:1px solid #eef3ff; border-radius:10px; padding:12px; background:#fff; display:flex; flex-direction:column; gap:8px; }
+    .order-head { display:flex; justify-content:space-between; align-items:center; }
+    .order-meta { color:var(--muted); font-size:13px; }
+    .order-right { text-align:right; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+    .amount { font-weight:800; }
+    .status-badge { padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px; }
+    .status-paid { background: rgba(26,163,74,0.12); color: var(--success); border:1px solid rgba(26,163,74,0.16); }
+    .status-pending { background: rgba(245,158,11,0.08); color: var(--warning); border:1px solid rgba(245,158,11,0.12); }
+    .status-other { background: rgba(218,0,55,0.06); color: var(--danger); border:1px solid rgba(218,0,55,0.1); }
+    .actions { display:flex; gap:8px; margin-top:8px; }
+    .btn { background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+    .btn.secondary { background:#eef3ff; color:var(--primary); border:1px solid #dbe9fb; }
+    .empty { padding:24px; color:#666; background:#fff; border-radius:10px; border:1px dashed #e6eef8; text-align:center; }
+    .modal-back { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:2000; }
+    .modal { background:#fff; border-radius:10px; padding:18px; max-width:720px; width:92%; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
+    @media (max-width:720px){ .order-right { align-items:flex-end; } .head { flex-direction:column; align-items:flex-start; gap:10px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <div class="title">Đơn hàng của tôi</div>
+        <div class="small">Lịch sử đơn hàng và thông tin thanh toán</div>
+      </div>
+      <div class="controls">
+        <button class="filter-btn active" data-filter="paid" id="showPaid">Đã thanh toán</button>
+        <button class="filter-btn" data-filter="all" id="showAll">Tất cả</button>
+        <button class="filter-btn" data-filter="pending" id="showPending">Chờ duyệt</button>
+        <button class="btn secondary" id="seedDemo">Tạo demo</button>
+        <button class="btn" id="backHome">Về Trang Chủ</button>
+      </div>
+    </div>
+
+    <div id="ordersArea" class="orders" aria-live="polite"></div>
+  </div>
+
+  <!-- modal -->
+  <div class="modal-back" id="modalBack" role="dialog" aria-hidden="true">
+    <div class="modal">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong id="modalTitle">Chi tiết đơn</strong>
+        <button class="btn secondary" id="closeModal">Đóng</button>
+      </div>
+      <div id="modalBody" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <script>
+    // Improved orders.html:
+    // - Normalize status when filtering (remove diacritics, lowercase)
+    // - Read/write per-user key orders:<userKey>
+    // - Default view = "Đã thanh toán" (paid)
+
+    const AUTH_KEY = 'authUser';
+
+    function getAuthUser(){ try { return JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); } catch { return null; } }
+    function getUserKey(){ const u=getAuthUser(); if(!u) return 'guest'; if(u.id) return 'user:'+u.id; if(u.email) return 'user:'+u.email.toLowerCase(); return 'user:'+ (u.name||'').replace(/\s+/g,'_').toLowerCase(); }
+    function ordersKey(){ return 'orders:' + getUserKey(); }
+
+    function getOrders(){ try{ return JSON.parse(localStorage.getItem(ordersKey())||'[]'); }catch{return [];} }
+    function setOrders(arr){ localStorage.setItem(ordersKey(), JSON.stringify(arr||[])); }
+
+    function normalizeText(s){
+      if(!s) return '';
+      return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+    }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+    function formatMoney(n){ return (Number(n)||0).toLocaleString() + ' VNĐ'; }
+
+    function statusBadge(status){
+      const n = normalizeText(status);
+      if(n.includes('da') || n.includes('dathanhtoan') || n.includes('da thanh toan') || n.includes('paid')) return `<span class="status-badge status-paid">Đã thanh toán</span>`;
+      if(n.includes('cho') || n.includes('chờ') || n.includes('pending')) return `<span class="status-badge status-pending">Chờ duyệt</span>`;
+      return `<span class="status-badge status-other">${escapeHtml(status||'Khác')}</span>`;
+    }
+
+    function render(filter='paid'){
+      const area = document.getElementById('ordersArea');
+      const user = getAuthUser();
+      if(!user){ area.innerHTML = `<div class="empty">Bạn chưa đăng nhập. Vui lòng <a href="login.html">đăng nhập</a>.</div>`; return; }
+
+      // merge guest orders if any (optional)
+      const guestKey = 'orders:guest';
+      const guestRaw = localStorage.getItem(guestKey);
+      if(guestRaw){
+        try{
+          const guest = JSON.parse(guestRaw||'[]');
+          if(Array.isArray(guest) && guest.length){ const current = getOrders(); setOrders(current.concat(guest)); localStorage.removeItem(guestKey); }
+        }catch(e){ console.warn(e); }
+      }
+
+      let orders = getOrders() || [];
+      if(filter === 'paid'){
+        orders = orders.filter(o => normalizeText(o.status).includes('da') || normalizeText(o.status).includes('paid') || normalizeText(o.status).includes('dathanhtoan'));
+      } else if(filter === 'pending'){
+        orders = orders.filter(o => normalizeText(o.status).includes('cho') || normalizeText(o.status).includes('pending'));
+      }
+
+      if(!orders.length){ area.innerHTML = '<div class="empty">Không có đơn hàng phù hợp.</div>'; return; }
+
+      orders.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+      area.innerHTML = '';
+      orders.forEach(o=>{
+        const itemsCount = (o.items||[]).reduce((s,it)=> s + (Number(it.qty)||1), 0);
+        const card = document.createElement('div'); card.className = 'order';
+        card.innerHTML = `<div class="order-head">
+          <div><div style="font-weight:700">Mã: ${escapeHtml(o.id||o.code||'')}</div><div class="order-meta">${escapeHtml(o.date||'')}</div></div>
+          <div class="order-right">
+            <div class="amount">${formatMoney(o.total)}</div>
+            <div class="order-meta">${itemsCount} sản phẩm • ${escapeHtml(o.status||'')}</div>
+            ${statusBadge(o.status)}
+            <div class="actions">
+              <button class="btn secondary" onclick="viewOrder('${escapeHtml(o.id||o.code||'')}')">Xem chi tiết</button>
+              <button class="btn" onclick="downloadInvoice('${escapeHtml(o.id||o.code||'')}')">Tải hóa đơn</button>
+            </div>
+          </div>
+        </div>`;
+        area.appendChild(card);
+      });
+    }
+
+    // modal & helpers
+    const modalBack = document.getElementById('modalBack');
+    function viewOrder(id){
+      const orders = getOrders();
+      const o = orders.find(x => String(x.id) === String(id) || String(x.code) === String(id));
+      if(!o) return alert('Không tìm thấy đơn');
+      const body = document.getElementById('modalBody');
+      const itemsHtml = (o.items||[]).map(it=>`<div style="border-bottom:1px dashed #eef2ff;padding:8px 0">
+        <div style="font-weight:700">${escapeHtml(it.name)}</div>
+        <div style="color:var(--muted)">${Number(it.qty)||1} × ${formatMoney(it.price)}</div>
+        <div style="color:#111;font-weight:600">Thành tiền: ${formatMoney((Number(it.price)||0)*(Number(it.qty)||1))}</div>
+      </div>`).join('');
+      body.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px">
+        <div><div style="font-weight:700">Mã đơn: ${escapeHtml(o.id||o.code||'')}</div><div style="color:var(--muted)">${escapeHtml(o.date||'')}</div></div>
+        <div style="text-align:right"><div style="font-weight:700">Tổng: ${formatMoney(o.total)}</div><div style="color:var(--muted)">Trạng thái: ${escapeHtml(o.status||'')}</div></div>
+      </div><hr style="border:none;border-top:1px dashed #eef2ff;margin:12px 0">${itemsHtml}
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn" onclick="printOrder('${escapeHtml(o.id||o.code||'')}')">In hóa đơn</button>
+        <button class="btn secondary" id="modalClose">Đóng</button>
+      </div>`;
+      modalBack.style.display = 'flex';
+      modalBack.setAttribute('aria-hidden','false');
+      document.getElementById('modalClose').onclick = hideModal;
+    }
+    function hideModal(){ modalBack.style.display = 'none'; modalBack.setAttribute('aria-hidden','true'); }
+    document.getElementById('closeModal').onclick = hideModal;
+    modalBack.addEventListener('click',(e)=>{ if(e.target===modalBack) hideModal(); });
+
+    function downloadInvoice(id){
+      const orders = getOrders();
+      const o = orders.find(x => String(x.id) === String(id) || String(x.code) === String(id));
+      if(!o) return alert('Không tìm thấy đơn');
+      const lines = ['HÓA ĐƠN ĐƠN HÀNG','------------------',`Mã đơn: ${o.id||o.code||''}`,`Ngày: ${o.date||''}`,'','SẢN PHẨM:'];
+      (o.items||[]).forEach(it=> lines.push(`- ${it.name} | ${Number(it.qty||1)} x ${Number(it.price||0).toLocaleString()} VNĐ`));
+      lines.push('','Tổng: ' + Number(o.total||0).toLocaleString() + ' VNĐ');
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `invoice_${o.id||o.code||'order'}.txt`; document.body.appendChild(a); a.click(); a.remove();
+    }
+    function printOrder(id){ const orders=getOrders(); const o=orders.find(x=>String(x.id)===String(id)||String(x.code)===String(id)); if(!o) return alert('Không tìm thấy đơn'); const w=window.open('','_blank'); const html=`<html><head><title>Hóa đơn ${o.id||o.code}</title></head><body><h2>Hóa đơn ${o.id||o.code}</h2><div>Ngày: ${o.date}</div><hr>${(o.items||[]).map(it=>`<div>${escapeHtml(it.name)} x${it.qty} - ${formatMoney(it.price)}</div>`).join('')}<hr><h3>Tổng: ${formatMoney(o.total)}</h3></body></html>`; w.document.write(html); w.document.close(); w.print(); }
+
+    // seed demo for testing
+    function seedDemo(){
+      const demo=[{id:'103',date:'2025-12-13',total:100000,status:'Đã thanh toán',items:[{id:'9',name:'Áo dài nam nữ',price:100000,qty:1}]},{id:'102',date:'2025-12-03',total:0,status:'Đã duyệt',items:[]},{id:'101',date:'2025-12-01',total:0,status:'Chờ duyệt',items:[]}];
+      setOrders(demo);
+      setActive('paid');
+    }
+
+    // controls
+    document.getElementById('backHome').onclick = ()=> location.href='index.html';
+    document.getElementById('seedDemo').onclick = seedDemo;
+    document.getElementById('showPaid').addEventListener('click', ()=> setActive('paid'));
+    document.getElementById('showAll').addEventListener('click', ()=> setActive('all'));
+    document.getElementById('showPending').addEventListener('click', ()=> setActive('pending'));
+
+    function setActive(filter){
+      document.querySelectorAll('.filter-btn').forEach(b=> b.classList.remove('active'));
+      if(filter==='paid') document.getElementById('showPaid').classList.add('active');
+      if(filter==='all') document.getElementById('showAll').classList.add('active');
+      if(filter==='pending') document.getElementById('showPending').classList.add('active');
+      render(filter);
+    }
+
+    // initial: show paid orders by default
+    (function init(){ setActive('paid'); })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1138 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <title>Trang chủ | Chợ thuê đồ SV</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        /* --- cơ bản --- */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI',Arial,sans-serif;
+            background: #fff;
+        }
+
+        .topbar {
+            background: linear-gradient(90deg,#1976d2 0,#1976d2 100%);
+            color: #fff;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+            box-shadow: 0 2px 8px #e3e9fe;
+            padding: 0 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin-left: 8px;
+            gap: 8px;
+        }
+
+        .search-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 12px;
+        }
+
+        .search-in {
+            flex: 1;
+            max-width: 640px;
+            padding: 10px 14px;
+            border-radius: 30px 0 0 30px;
+            border: none;
+            font-size: 15px;
+        }
+
+        .search-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 0 30px 30px 0;
+            background: #1976d2;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .topbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 8px;
+            position: relative;
+        }
+
+            .topbar-menu a, .topbar-menu button {
+                color: #fff;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-weight: 600;
+                padding: 6px 8px;
+                border-radius: 6px;
+            }
+
+            .topbar-menu .btn-topbar {
+                background: #fff;
+                color: #1976d2;
+                padding: 7px 14px;
+                border-radius: 20px;
+                font-weight: 700;
+                box-shadow: 0 1px 6px #dbe9fb;
+            }
+
+        .cart-cnt {
+            background: #f15b2b;
+            color: #fff;
+            font-size: 13px;
+            border-radius: 10px;
+            padding: 2px 7px;
+            position: absolute;
+            top: -8px;
+            right: -6px;
+            min-width: 22px;
+            text-align: center;
+        }
+        /* account */
+        .account-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.12);
+            cursor: pointer;
+        }
+
+            .account-btn img {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid rgba(255,255,255,0.18);
+            }
+
+        .account-dropdown {
+            position: absolute;
+            right: 0;
+            top: 46px;
+            background: #fff;
+            color: #222;
+            min-width: 200px;
+            border-radius: 8px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            display: none;
+            overflow: hidden;
+            z-index: 2000;
+        }
+
+            .account-dropdown a, .account-dropdown button {
+                display: block;
+                width: 100%;
+                text-align: left;
+                padding: 10px 14px;
+                border: none;
+                background: none;
+                color: #222;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+                .account-dropdown a:hover, .account-dropdown button:hover {
+                    background: #f4f7ff;
+                }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .welcome-title {
+            margin-top: 5px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 28px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-list, .all-items-list {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .item-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1.5px 8px #e7edf8;
+            width: 210px;
+            flex: 0 0 210px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .item-thumb {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .item-info {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .item-author {
+            color: #778099;
+            font-size: 13px;
+        }
+
+        .item-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        .cart-btn {
+            background: #1976d2;
+            color: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .detail-btn {
+            background: #eef3ff;
+            color: #346aff;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* cart popup */
+        .cart-popup {
+            position: fixed;
+            top: 76px;
+            right: 18px;
+            background: #fff;
+            border-radius: 10px;
+            min-width: 320px;
+            max-width: 360px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            display: none;
+            z-index: 1500;
+        }
+
+        .cart-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f2f2f8;
+        }
+
+            .cart-item img {
+                width: 56px;
+                height: 56px;
+                border-radius: 8px;
+                object-fit: cover;
+            }
+
+        .cart-item-name {
+            font-weight: 700;
+        }
+
+        .cart-item-meta {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .cart-actions {
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* Chatbox styles (AI chat) */
+        .chat-toggle-btn {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#1976d2,#4caf50);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(25,118,210,0.24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            cursor: pointer;
+            border: none;
+        }
+
+        .chatbox {
+            position: fixed;
+            right: 18px;
+            bottom: 86px;
+            width: 360px;
+            max-width: calc(100% - 36px);
+            height: 480px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 2000;
+        }
+
+            .chatbox.open {
+                display: flex;
+            }
+
+        .chatbox-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: linear-gradient(90deg,#1976d2,#4caf50);
+            color: #fff;
+        }
+
+            .chatbox-header .title {
+                font-weight: 700;
+            }
+
+        .chatbox-body {
+            flex: 1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            background: #f7f9ff;
+        }
+
+        .chat-message {
+            max-width: 82%;
+            padding: 8px 10px;
+            border-radius: 10px;
+            line-height: 1.3;
+        }
+
+            .chat-message.user {
+                align-self: flex-end;
+                background: #1976d2;
+                color: #fff;
+                border-bottom-right-radius: 4px;
+            }
+
+            .chat-message.assistant {
+                align-self: flex-start;
+                background: #fff;
+                color: #222;
+                border: 1px solid #e6eefc;
+            }
+
+        .chatbox-footer {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            align-items: center;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 18px;
+            border: 1px solid #e5e9f8;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-send-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .chat-options {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .chat-typing {
+            display: inline-block;
+            width: 12px;
+            height: 8px;
+            background: linear-gradient(90deg,#1976d2,#4caf50);
+            border-radius: 4px;
+            opacity: 0.9;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .2
+            }
+
+            100% {
+                opacity: 1
+            }
+        }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .search-in {
+                max-width: 320px;
+            }
+
+            .chatbox {
+                width: 94%;
+                right: 3%;
+                left: 3%;
+                bottom: 86px;
+                height: 56vh;
+            }
+
+            .chat-toggle-btn {
+                right: 12px;
+                bottom: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo"><i class="fa fa-briefcase"></i> Chợ thuê đồ tốt</div>
+
+        <div class="search-wrap">
+            <input id="searchInput" class="search-in" type="text" placeholder="Tìm kiếm sản phẩm, chủ cho thuê, ...">
+            <button id="searchBtn" class="search-btn">Tìm</button>
+            <button id="filterToggle" class="topbar-filter" title="Bộ lọc" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.12);padding:6px 10px;border-radius:20px;">Bộ lọc</button>
+        </div>
+
+        <div class="topbar-menu" id="topbarMenu">
+            <a href="#" id="homeLink">Trang Chủ</a>
+            <a href="#" id="allItemsLink">Danh Sách Đồ</a>
+            <button class="btn-post" onclick="window.location='post.html'">Đăng bài</button>
+
+            <div style="position:relative;">
+                <button class="cart-button" id="cartBtn" title="Giỏ hàng" style="position:relative;">
+                    <i class="fa fa-cart-shopping"></i>
+                    <span style="margin-left:6px;">Giỏ Hàng</span>
+                    <span class="cart-cnt" id="cartCount">0</span>
+                </button>
+            </div>
+
+            <button class="btn-topbar" id="registerBtn" onclick="window.location='register.html'">Đăng ký</button>
+            <button class="btn-topbar" id="loginBtn" onclick="window.location='login.html'">Đăng nhập</button>
+
+            <div class="account-wrap" id="accountWrap" style="display:none;">
+                <div class="account-btn" id="accountBtn" title="Tài khoản">
+                    <img id="accountAvatar" src="" alt="avatar">
+                    <span id="accountName">Tài khoản</span>
+                    <i class="fa fa-caret-down"></i>
+                </div>
+                <div class="account-dropdown" id="accountDropdown" aria-hidden="true">
+                    <a href="profile.html">Tài khoản của tôi</a>
+                    <a href="orders.html">Đơn hàng</a>
+                    <button id="logoutBtn">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- optional filters area (hidden by default) -->
+    <div id="filterPanel" style="display:none;background:#fff;padding:12px;border-bottom:1px solid #eee;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;gap:12px;align-items:center;">
+            <select id="categoryFilter" style="padding:8px;border-radius:8px;">
+                <option value="">Tất cả danh mục</option>
+                <option value="sách">Sách</option>
+                <option value="điện tử">Điện tử</option>
+                <option value="quần áo">Quần áo</option>
+                <option value="phương tiện">Phương tiện</option>
+            </select>
+            <select id="priceFilter" style="padding:8px;border-radius:8px;">
+                <option value="">Giá</option>
+                <option value="0-500k">0 - 500,000</option>
+                <option value="500k-1tr">500,000 - 1,000,000</option>
+                <option value="1tr-3tr">1,000,000 - 3,000,000</option>
+                <option value="3tr-999tr">&gt; 3,000,000</option>
+            </select>
+            <button id="applyFilter" style="padding:8px 12px;border-radius:8px;background:#1976d2;color:#fff;border:none;">Áp dụng</button>
+        </div>
+    </div>
+
+    <!-- cart popup -->
+    <div class="cart-popup" id="cartPopup" aria-hidden="true">
+        <div class="cart-list" id="cartList"></div>
+        <div class="cart-actions">
+            <div style="font-weight:700;">Tổng: <span id="popupTotal">0 VNĐ</span></div>
+            <div>
+                <button class="checkout-btn" id="gotoCart">Vào giỏ hàng</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-title">Chào mừng trở lại, <span class="username">khách!</span></div>
+
+        <div class="section-title"><i class="fa fa-book-open"></i> Tiếp Tục Thuê</div>
+        <div class="item-list" id="mainList"></div>
+
+        <div class="section-title recommend"><i class="fa fa-magic"></i> Có Thể Bạn Sẽ Thích</div>
+        <div class="item-list" id="recommendList"></div>
+
+        <div class="section-title"><i class="fa fa-list"></i> Danh Sách Tất Cả</div>
+        <div class="all-items-list" id="allItemsList"></div>
+    </div>
+
+    <!-- Chatbox UI -->
+    <button id="chatToggle" class="chat-toggle-btn" title="Trợ lý AI"><i class="fa fa-robot" style="font-size:18px;"></i></button>
+
+    <div id="chatBox" class="chatbox" role="dialog" aria-label="Trợ lý AI">
+        <div class="chatbox-header">
+            <div><i class="fa fa-robot"></i></div>
+            <div class="title">Trợ lý AI - Chợ Thuê Đồ</div>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+                <button id="clearChat" style="background:transparent;border:none;color:rgba(255,255,255,0.9);cursor:pointer;font-weight:600;">Xóa</button>
+                <button id="closeChat" style="background:transparent;border:none;color:rgba(255,255,255,0.9);cursor:pointer;font-weight:700;"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+
+        <div class="chatbox-body" id="chatBody" aria-live="polite"></div>
+
+        <div class="chat-options">
+            <label style="display:flex;align-items:center;gap:6px;">
+                <input type="checkbox" id="useAiApi"> Gọi API (nếu có)
+            </label>
+            <div style="margin-left:auto;font-size:12px;color:#888;">Lưu tại thiết bị</div>
+        </div>
+
+        <div class="chatbox-footer">
+            <input id="chatInput" class="chat-input" placeholder="Nhập câu hỏi, ví dụ: tôi muốn thuê áo dài vào cuối tuần..." />
+            <button id="sendChat" class="chat-send-btn">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        // ---------- data ----------
+        const allItems = [
+            { id: "1", name: "Laptop dell", img: "https://i.pinimg.com/736x/a7/6c/4b/a76c4babfdab739579551c478c46e52c.jpg", author: "Nguyễn Văn Hải", progress: "Đang thuê đến: 05/12/2025", price: 100000, category: "điện tử" },
+            { id: "2", name: "Balo thể thao", img: "https://i.pinimg.com/736x/44/93/96/44939623956f7e83b821ee851005e38a.jpg", author: "Trần Anh Quân", progress: "Đang thuê đến: 06/12/2025", price: 80000, category: "quần áo" },
+            { id: "3", name: "Sách kỹ năng mềm", img: "https://i.pinimg.com/736x/6f/d6/44/6fd644e267361cb38cf32b272a7b89c5.jpg", author: "Lê Thị Hoài", progress: "Đang thuê đến: 07/12/2025", price: 30000, category: "sách" },
+            { id: "4", name: "Áo cử nhân tốt nghiệp", img: "https://i.pinimg.com/736x/c9/b4/5e/c9b45e826b0d8658fbc02540dc376bfa.jpg", author: "Huỳnh Tấn Phát", progress: "", price: 20000, category: "quần áo" },
+            { id: "5", name: "Giáo trình Cấu trúc dữ liệu", img: "https://i.pinimg.com/736x/9a/a8/d1/9aa8d1f956818f1d8188aeb3b5cc799f.jpg", author: "Võ Xuân Vũ", progress: "", price: 50000, category: "sách" },
+            { id: "6", name: "Máy ảnh", img: "https://i.pinimg.com/736x/c5/3c/9d/c53c9de66be127dc8e505dd1855ea712.jpg", author: "Phạm Thị Hải Yến", progress: "", price: 250000, category: "điện tử" },
+            { id: "7", name: "Giáo trình speaking level 1, 2, 3", img: "https://i.pinimg.com/736x/9c/4c/dd/9c4cddcc5357e0105eb1ca05776b7234.jpg", author: "Trần Thị Ngọc Ánh", progress: "", price: 60000, category: "sách" },
+            { id: "8", name: "Đầm dạ hội", img: "https://i.pinimg.com/736x/a7/5b/a6/a75ba6bc4f09e6159253e59f74d5803f.jpg", author: "Nguyễn Thị Hải Yến", progress: "", price: 18000, category: "quần áo" },
+            { id: "9", name: "Áo dài nam nữ", img: "https://i.pinimg.com/736x/5e/ab/08/5eab083116e29aea1027104ceb5cd977.jpg", author: "Đỗ Long", progress: "", price: 100000, category: "quần áo" }
+        ];
+
+        const mainItems = allItems.slice(0, 3);
+        const recommendItems = allItems.slice(3);
+
+        // ---------- helpers ----------
+        function escapeHtml(str) { return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]); }
+
+        // normalize text: lowercase + remove diacritics + collapse whitespace
+        function normalizeText(s) {
+            if (!s) return '';
+            return s.toString()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toLowerCase();
+        }
+
+        // ---------- auth (local demo) ----------
+        const AUTH_KEY = 'authUser';
+
+        function getAuthUser() { try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch (e) { return null; } }
+
+        // setAuthUser updated to merge guest cart into user cart and refresh UI
+        function setAuthUser(user) {
+            if (!user) {
+                localStorage.removeItem(AUTH_KEY);
+            } else {
+                localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+                // merge guest cart into user's cart
+                try {
+                    mergeGuestCartIntoUser();
+                } catch (e) {
+                    console.warn('mergeGuestCartIntoUser failed', e);
+                }
+            }
+            renderAuthMenu();
+            updateCartCount();
+        }
+
+        function logout() { localStorage.removeItem(AUTH_KEY); renderAuthMenu(); updateCartCount(); }
+
+        function renderAuthMenu() {
+            const user = getAuthUser();
+            const accWrap = document.getElementById('accountWrap');
+            const regBtn = document.getElementById('registerBtn');
+            const loginBtn = document.getElementById('loginBtn');
+            const accountName = document.getElementById('accountName');
+            const accountAvatar = document.getElementById('accountAvatar');
+
+            if (user && user.name) {
+                accWrap.style.display = 'inline-block';
+                regBtn.style.display = 'none';
+                loginBtn.style.display = 'none';
+                accountName.innerText = user.name.length > 16 ? (user.name.slice(0, 14) + '…') : user.name;
+                if (user.avatar) accountAvatar.src = user.avatar;
+                else {
+                    const initials = user.name.split(' ').filter(Boolean).map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'U';
+                    accountAvatar.src = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='100%' height='100%' fill='%231976d2'/><text x='50%' y='55%' font-size='28' fill='white' font-family='Segoe UI, Arial' text-anchor='middle'>${initials}</text></svg>`;
+                }
+            } else {
+                accWrap.style.display = 'none';
+                regBtn.style.display = 'inline-block';
+                loginBtn.style.display = 'inline-block';
+            }
+        }
+
+        // account dropdown toggle & logout
+        document.addEventListener('click', function (e) {
+            const accWrap = document.getElementById('accountWrap');
+            const dropdown = document.getElementById('accountDropdown');
+            const btn = document.getElementById('accountBtn');
+            if (!accWrap) return;
+            if (btn && btn.contains(e.target)) {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            } else {
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.onclick = function () {
+                if (confirm('Bạn có chắc muốn đăng xuất?')) { setAuthUser(null); alert('Bạn đã đăng xuất.'); location.reload(); }
+            };
+            const demoLoginBtn = document.getElementById('demoLogin');
+            if (demoLoginBtn) demoLoginBtn.onclick = function () {
+                const demo = { name: 'Nguyễn Văn A', email: 'demo@example.com', avatar: '' };
+                setAuthUser(demo);
+                alert('Đã đăng nhập thử: ' + demo.name);
+            };
+        });
+
+        // ---------- per-user CART (localStorage keys) ----------
+        // generate a stable key for the current user (prefer user.email or id), fallback to 'guest'
+        function getUserKey() {
+            const user = getAuthUser();
+            if (!user) return 'guest';
+            if (user.id) return 'user:' + String(user.id);
+            if (user.email) return 'user:' + String(user.email).toLowerCase();
+            return 'user:' + String(user.name || 'unknown').replace(/\s+/g, '_').toLowerCase();
+        }
+        function getCartStorageKey() { return 'cart:' + getUserKey(); }
+
+        // Read cart for current user
+        function getCart() {
+            try {
+                return JSON.parse(localStorage.getItem(getCartStorageKey()) || '[]');
+            } catch (e) {
+                console.warn('Invalid cart data, reset', e);
+                return [];
+            }
+        }
+
+        // Write cart for current user
+        function setCart(c) {
+            try {
+                localStorage.setItem(getCartStorageKey(), JSON.stringify(c || []));
+            } catch (e) {
+                console.error('Cannot save cart', e);
+            }
+        }
+
+        // Update cart count UI based on current user's cart
+        function updateCartCount() {
+            const cart = getCart();
+            const totalQty = cart.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+            const el = document.getElementById('cartCount');
+            if (el) el.innerText = totalQty;
+        }
+
+        // Render cart popup for current user (uses per-user getCart)
+        function renderCartPopup() {
+            const cart = getCart();
+            const listEl = document.getElementById('cartList');
+            if (!listEl) return;
+            if (!cart.length) {
+                listEl.innerHTML = '<div style="padding:18px;color:#777">Giỏ hàng trống</div>';
+                const popupTotal = document.getElementById('popupTotal');
+                if (popupTotal) popupTotal.innerText = '0 VNĐ';
+                return;
+            }
+            let html = '';
+            let total = 0;
+            cart.forEach((it, idx) => {
+                const line = (Number(it.price) || 0) * (Number(it.qty) || 1);
+                total += line;
+                html += `<div class="cart-item" data-idx="${idx}">
+                                <img src="${escapeHtml(it.img)}" alt="">
+                                <div style="flex:1">
+                                    <div class="cart-item-name">${escapeHtml(it.name)}</div>
+                                    <div class="cart-item-meta">Giá: ${Number(it.price || 0).toLocaleString()} VNĐ • Số lượng: ${Number(it.qty || 1)}</div>
+                                </div>
+                                <button class="cart-remove" data-idx="${idx}" title="Xóa">&times;</button>
+                            </div>`;
+            });
+            listEl.innerHTML = html;
+            const popupTotal = document.getElementById('popupTotal');
+            if (popupTotal) popupTotal.innerText = total.toLocaleString() + ' VNĐ';
+        }
+
+        // Add item to current user's cart
+        function addToCartItem(item) {
+            const id = item.id;
+            const name = item.name;
+            const img = item.img;
+            const price = Number(item.price || 0);
+
+            const cart = getCart();
+            const found = cart.find(x => x.id === id);
+            if (found) {
+                found.qty = (Number(found.qty) || 1) + 1;
+            } else {
+                cart.push({ id, name, img, qty: 1, price });
+            }
+            setCart(cart);
+            updateCartCount();
+        }
+
+        // Merge guest cart into user's cart (called after login)
+        function mergeGuestCartIntoUser() {
+            const guestKey = 'cart:guest';
+            const guestRaw = localStorage.getItem(guestKey);
+            if (!guestRaw) return;
+            try {
+                const guestCart = JSON.parse(guestRaw || '[]');
+                if (!Array.isArray(guestCart) || guestCart.length === 0) {
+                    localStorage.removeItem(guestKey);
+                    return;
+                }
+                const userCart = getCart();
+                const map = new Map();
+                userCart.forEach(i => map.set(i.id, Object.assign({}, i)));
+                guestCart.forEach(i => {
+                    if (map.has(i.id)) map.get(i.id).qty = (Number(map.get(i.id).qty) || 0) + (Number(i.qty) || 0);
+                    else map.set(i.id, Object.assign({}, i));
+                });
+                const merged = Array.from(map.values());
+                setCart(merged);
+                localStorage.removeItem(guestKey);
+            } catch (e) {
+                console.warn('Cannot merge guest cart', e);
+            }
+        }
+
+        // Replace bindCartButtons to use addToCartItem
+        function bindCartButtons() {
+            document.querySelectorAll('.cart-btn').forEach(btn => {
+                btn.onclick = function () {
+                    const card = this.closest('.item-card');
+                    if (!card) return;
+                    const id = card.getAttribute('data-id');
+                    const name = card.getAttribute('data-name');
+                    const img = card.getAttribute('data-img');
+                    const source = allItems.find(x => x.id === id);
+                    const price = source ? source.price : 0;
+                    addToCartItem({ id, name, img, price });
+                    alert('Đã thêm vào giỏ hàng!');
+                }
+            });
+        }
+
+        // handle popup remove for per-user cart
+        document.getElementById('cartList').addEventListener('click', function (e) {
+            const rem = e.target.closest('.cart-remove');
+            if (rem) {
+                const idx = Number(rem.getAttribute('data-idx'));
+                let cart = getCart();
+                if (idx >= 0 && idx < cart.length) {
+                    if (confirm('Xóa sản phẩm khỏi giỏ?')) {
+                        cart.splice(idx, 1);
+                        setCart(cart);
+                        renderCartPopup();
+                        updateCartCount();
+                    }
+                }
+            }
+        });
+
+        // when clicking cart button open per-user popup
+        document.getElementById('cartBtn').onclick = function () {
+            renderCartPopup();
+            const pop = document.getElementById('cartPopup');
+            pop.style.display = 'block';
+        };
+
+        document.getElementById('gotoCart').onclick = function () { window.location.href = 'cart.html'; };
+
+        // ---------- search & filter ----------
+        function parsePriceRange(priceValue) {
+            let min = 0, max = Infinity;
+            if (priceValue === '0-500k') { min = 0; max = 500000; }
+            if (priceValue === '500k-1tr') { min = 500000; max = 1000000; }
+            if (priceValue === '1tr-3tr') { min = 1000000; max = 3000000; }
+            if (priceValue === '3tr-999tr') { min = 3000000; max = 999000000; }
+            return { min, max };
+        }
+
+        // parse user number like "100", "100k", "1.5tr", "100.000" -> number in VND
+        function parseUserNumberToVnd(raw) {
+            if (!raw) return null;
+            const m = raw.toString().toLowerCase().match(/([\d.,]+)\s*(k|m|tr|trieu|triệu)?/i);
+            if (!m) return null;
+            let num = m[1].replace(/[.,]/g, '');
+            let v = Number(num);
+            if (isNaN(v)) return null;
+            const unit = (m[2] || '').toLowerCase();
+            if (unit === 'k') v = v * 1000;
+            if (unit === 'm' || unit === 'tr' || unit === 'trieu' || unit === 'triệu') v = v * 1000000;
+            return v;
+        }
+
+        function showAllItemsFiltered(keyword = '') {
+            // hide main/recommend sections when showing search results
+            document.getElementById('mainList').style.display = 'none';
+            document.getElementById('recommendList').style.display = 'none';
+            const recommendTitle = document.querySelector('.section-title.recommend');
+            if (recommendTitle) recommendTitle.style.display = 'none';
+
+            const rawInput = (keyword || document.getElementById('searchInput').value || '').trim();
+            const kw = normalizeText(rawInput);
+            const catRaw = (document.getElementById('categoryFilter').value || '');
+            const cat = normalizeText(catRaw);
+            const price = document.getElementById('priceFilter').value || '';
+            const { min, max } = parsePriceRange(price);
+
+            // parse numeric search (supports k, m, tr)
+            const searchNumber = parseUserNumberToVnd(rawInput);
+
+            const result = allItems.filter(it => {
+                // normalized fields
+                const name = normalizeText(it.name);
+                const author = normalizeText(it.author);
+                const category = normalizeText(it.category);
+                const progress = normalizeText(it.progress || '');
+                const priceVal = Number(it.price || 0);
+
+                // keyword matching (search across name / author / category / progress / price)
+                let matchKeyword = true;
+                if (kw) {
+                    const hay = [name, author, category, progress, String(priceVal)].join(' ');
+                    matchKeyword = hay.includes(kw);
+                    if (!matchKeyword && searchNumber !== null) {
+                        // allow approx match by price when user entered a number (±15%)
+                        matchKeyword = Math.abs(priceVal - searchNumber) <= Math.round(searchNumber * 0.15);
+                    }
+                }
+
+                // if user typed keyword, ignore category filter (keyword has priority)
+                const matchCategory = kw ? true : (!cat || category === cat);
+                const matchPrice = (priceVal >= min && priceVal <= max);
+
+                return matchKeyword && matchCategory && matchPrice;
+            });
+
+            renderAllItems(result);
+            bindCartButtons();
+            document.getElementById('allItemsList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        document.getElementById('searchBtn').addEventListener('click', showAllItemsFiltered);
+        document.getElementById('searchInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); showAllItemsFiltered(); } });
+        document.getElementById('applyFilter').addEventListener('click', showAllItemsFiltered);
+        document.getElementById('filterToggle').addEventListener('click', function () { const p = document.getElementById('filterPanel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; });
+
+        // ---------- AI Chat functionality ----------
+        const CHAT_STORAGE_KEY = 'ai_chat_history_v1';
+
+        function getChatHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+        function setChatHistory(h) { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(h || [])); }
+
+        function renderChat() {
+            const body = document.getElementById('chatBody');
+            const history = getChatHistory();
+            body.innerHTML = '';
+            if (!history.length) {
+                const p = document.createElement('div');
+                p.style.color = '#666';
+                p.style.fontSize = '14px';
+                p.style.padding = '6px';
+                p.innerText = 'Xin chào! Tôi có thể giúp bạn tìm đồ, gợi ý danh mục, hoặc trả lời các câu hỏi liên quan đến thuê đồ.';
+                body.appendChild(p);
+                return;
+            }
+            history.forEach(m => {
+                const el = document.createElement('div');
+                el.className = 'chat-message ' + (m.role === 'user' ? 'user' : 'assistant');
+                el.innerText = m.text;
+                body.appendChild(el);
+            });
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function addMessage(role, text) {
+            const history = getChatHistory();
+            history.push({ role, text, ts: Date.now() });
+            setChatHistory(history);
+            renderChat();
+        }
+
+        async function sendToAI(userMessage) {
+            const useApi = document.getElementById('useAiApi').checked;
+            const history = getChatHistory();
+
+            if (useApi) {
+                try {
+                    const resp = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: userMessage, history })
+                    });
+                    if (!resp.ok) throw new Error('Network response was not ok');
+                    const data = await resp.json();
+                    return data.reply || JSON.stringify(data);
+                } catch (err) {
+                    console.warn('AI API lỗi, sử dụng phản hồi giả:', err);
+                    return generateMockResponse(userMessage);
+                }
+            } else {
+                return generateMockResponse(userMessage);
+            }
+        }
+
+        function generateMockResponse(userMessage) {
+            const msg = (userMessage || '').toLowerCase();
+            if (!msg.trim()) return "Bạn chưa nhập nội dung. Hãy ghi câu hỏi hoặc yêu cầu của bạn.";
+            if (msg.includes('giá') || msg.includes('bao nhiêu')) return "Bạn có thể cho biết sản phẩm bạn quan tâm? Mình sẽ kiểm tra giá và chủ cho thuê giúp bạn.";
+            if (msg.includes('áo dài') || msg.includes('đầm') || msg.includes('cử nhân')) return "Mình thấy có nhiều lựa chọn áo dài/đầm. Bạn cần kích cỡ, ngày thuê, hay ngân sách?";
+            if (msg.includes('chủ') || msg.includes('người cho thuê')) return "Bạn có thể vào trang chi tiết sản phẩm để xem thông tin chủ cho thuê và liên hệ trực tiếp.";
+            if (msg.includes('xin chào') || msg.includes('hi') || msg.includes('hello')) return "Xin chào! Mình có thể giúp gì cho bạn hôm nay?";
+            const suggestions = allItems.slice(0, 3).map(it => `${it.name} — ${it.price.toLocaleString()} VNĐ`).join('\n');
+            return "Mình gợi ý một số sản phẩm:\n" + suggestions + "\nBạn muốn xem chi tiết sản phẩm nào?";
+        }
+
+        // Chat UI bindings
+        const chatToggle = document.getElementById('chatToggle');
+        const chatBox = document.getElementById('chatBox');
+        const closeChat = document.getElementById('closeChat');
+        const clearChat = document.getElementById('clearChat');
+        const sendChatBtn = document.getElementById('sendChat');
+        const chatInput = document.getElementById('chatInput');
+
+        chatToggle.addEventListener('click', () => {
+            const open = chatBox.classList.toggle('open');
+            if (open) { renderChat(); setTimeout(() => chatInput.focus(), 150); }
+        });
+        closeChat.addEventListener('click', () => { chatBox.classList.remove('open'); });
+
+        clearChat.addEventListener('click', () => {
+            if (confirm('Xóa toàn bộ lịch sử chat?')) {
+                setChatHistory([]);
+                renderChat();
+            }
+        });
+
+        async function handleSend() {
+            const text = (chatInput.value || '').trim();
+            if (!text) return;
+            addMessage('user', text);
+            chatInput.value = '';
+            const body = document.getElementById('chatBody');
+            const typingEl = document.createElement('div');
+            typingEl.className = 'chat-message assistant';
+            typingEl.innerHTML = '<span class="chat-typing"></span> Đang trả lời...';
+            body.appendChild(typingEl);
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const reply = await sendToAI(text);
+                typingEl.remove();
+                addMessage('assistant', reply);
+            } catch (err) {
+                typingEl.remove();
+                addMessage('assistant', 'Có lỗi xảy ra khi gọi AI: ' + (err.message || err));
+            }
+        }
+
+        sendChatBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        // ---------- render items ----------
+        function renderMainItems() {
+            const container = document.getElementById('mainList');
+            container.innerHTML = mainItems.map(it => `
+                            <div class="item-card" data-id="${escapeHtml(it.id)}" data-name="${escapeHtml(it.name)}" data-img="${escapeHtml(it.img)}">
+                                <img class="item-thumb" src="${escapeHtml(it.img)}" alt="">
+                                <div class="item-info">
+                                    <div class="item-name">${escapeHtml(it.name)}</div>
+                                    <div class="item-author">Chủ: ${escapeHtml(it.author)}</div>
+                                    <div class="item-actions">
+                                        <button class="cart-btn">Thêm vào giỏ</button>
+                                        <button class="detail-btn" onclick="window.location='product_detail.html?id=${it.id}'">Xem chi tiết</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+        }
+        function renderRecommendItems() {
+            const container = document.getElementById('recommendList');
+            container.innerHTML = recommendItems.map(it => `
+                            <div class="item-card" data-id="${escapeHtml(it.id)}" data-name="${escapeHtml(it.name)}" data-img="${escapeHtml(it.img)}">
+                                <img class="item-thumb" src="${escapeHtml(it.img)}" alt="">
+                                <div class="item-info">
+                                    <div class="item-name">${escapeHtml(it.name)}</div>
+                                    <div class="item-author">Chủ: ${escapeHtml(it.author)}</div>
+                                    <div class="item-actions">
+                                        <button class="cart-btn">Thêm vào giỏ</button>
+                                        <button class="detail-btn" onclick="window.location='product_detail.html?id=${it.id}'">Xem chi tiết</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+        }
+        function renderAllItems(list = allItems) {
+            const container = document.getElementById('allItemsList');
+            if (!list || !list.length) {
+                container.innerHTML = '<div style="padding:18px;color:#777">Không tìm thấy kết quả</div>';
+                return;
+            }
+            container.innerHTML = list.map(it => `
+                            <div class="item-card" data-id="${escapeHtml(it.id)}" data-name="${escapeHtml(it.name)}" data-img="${escapeHtml(it.img)}">
+                                <img class="item-thumb" src="${escapeHtml(it.img)}" alt="">
+                                <div class="item-info">
+                                    <div class="item-name">${escapeHtml(it.name)}</div>
+                                    <div class="item-author">Chủ: ${escapeHtml(it.author)}</div>
+                                    <div class="item-actions">
+                                        <button class="cart-btn">Thêm vào giỏ</button>
+                                        <button class="detail-btn" onclick="window.location='product_detail.html?id=${it.id}'">Xem chi tiết</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+        }
+
+        // ---------- init ----------
+        function init() {
+            renderMainItems();
+            renderRecommendItems();
+            renderAllItems();
+            bindCartButtons();
+            updateCartCount();
+            renderAuthMenu();
+
+            const homeLink = document.getElementById('homeLink');
+            if (homeLink) {
+                homeLink.onclick = function (e) {
+                    e.preventDefault();
+                    document.getElementById('mainList').style.display = 'flex';
+                    document.getElementById('recommendList').style.display = 'flex';
+                    const recommendTitle = document.querySelector('.section-title.recommend');
+                    if (recommendTitle) recommendTitle.style.display = 'flex';
+                    renderAllItems(allItems);
+                    bindCartButtons();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+            }
+        }
+
+        // single observer to rebind cart buttons after DOM changes
+        const observer = new MutationObserver(() => { bindCartButtons(); });
+        observer.observe(document.getElementById('mainList'), { childList: true });
+        observer.observe(document.getElementById('recommendList'), { childList: true });
+        observer.observe(document.getElementById('allItemsList'), { childList: true });
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng Bài | Chợ Thuê Đồ SV</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: 600;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #1e4fcf;
+            }
+
+        .img-preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+            .img-preview img {
+                width: 200px;
+                border-radius: 10px;
+                margin-top: 10px;
+                display: none;
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Đăng Bài Cho Thuê</h2>
+
+        <label>Tên sản phẩm</label>
+        <input type="text" id="title" placeholder="Ví dụ: Laptop Dell, Váy dự tiệc...">
+
+        <label>Giá thuê (VND / ngày)</label>
+        <input type="number" id="price" placeholder="Nhập giá thuê">
+
+        <label>Danh mục</label>
+        <select id="category">
+            <option value="điện tử">Điện tử</option>
+            <option value="thời trang">Thời trang</option>
+            <option value="đồ gia dụng">Đồ gia dụng</option>
+            <option value="khác">Khác</option>
+        </select>
+
+        <label>Mô tả chi tiết</label>
+        <textarea id="description" rows="4" placeholder="Nhập mô tả sản phẩm..."></textarea>
+
+        <label>Hình ảnh sản phẩm</label>
+        <input type="file" id="imageInput" accept="image/*">
+
+        <div class="img-preview">
+            <img id="preview">
+        </div>
+
+        <button id="btnSubmit">Đăng Bài</button>
+    </div>
+    <script>
+        const imgInput = document.getElementById("imageInput");
+        const preview = document.getElementById("preview");
+        let imageData = "";
+
+        // Xem trước ảnh
+        imgInput.addEventListener("change", () => {
+            const file = imgInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                imageData = reader.result;
+                preview.src = imageData;
+                preview.style.display = "block";
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Khi bấm đăng bài
+        document.getElementById("btnSubmit").addEventListener("click", () => {
+            const title = document.getElementById("title").value;
+            const price = document.getElementById("price").value;
+            const desc = document.getElementById("description").value;
+            const cate = document.getElementById("category").value;
+
+            if (!title || !price || !desc || !imageData) {
+                alert("Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+
+            // 1. Lấy danh sách cũ
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+            // 2. Thêm bài mới
+            posts.push({
+                title: title,
+                price: price,
+                description: desc,
+                category: cate,
+                image: imageData
+            });
+
+            // 3. Lưu lại vào localStorage
+            localStorage.setItem("posts", JSON.stringify(posts));
+
+            alert("Đăng bài thành công!");
+
+            // 4. Quay về trang chủ
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+</html>

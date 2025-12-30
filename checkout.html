@@ -1,0 +1,158 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Thanh toán | Chợ thuê đồ SV</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{--primary:#1976d2;--muted:#6b7280;--bg:#f7f9ff}
+    body{font-family:Segoe UI, Arial, sans-serif;background:var(--bg);margin:0;padding:24px}
+    .wrap{max-width:760px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 8px 30px rgba(16,24,40,0.06)}
+    h1{color:var(--primary);margin:0 0 8px}
+    .muted{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .qr-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px;border-radius:10px;border:1px solid #eef2f9}
+    .items-list{width:100%;margin-bottom:8px}
+    .item-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed #eef2f9}
+    .total{font-weight:800;color:#da0037;margin-top:8px}
+    .btn{background:var(--primary);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700}
+    .btn.ghost{background:#eef3ff;color:var(--primary);border:1px solid #dbe9fb}
+    .note{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Thanh Toán — QR (demo)</h1>
+    <div class="muted">Quét QR bằng ứng dụng ngân hàng và sau khi chuyển xong bấm "Tôi đã thanh toán".</div>
+
+    <div id="checkoutArea" class="qr-box">
+      <div class="items-list" id="itemsList"></div>
+      <div class="total" id="totalAmount">Tổng tiền: 0 VNĐ</div>
+
+      <!-- placeholder QR image for demo -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=demo" alt="QR" style="width:180px;height:180px;border-radius:6px;border:1px solid #eee">
+
+      <div style="width:100%;display:flex;gap:10px;justify-content:center;margin-top:6px">
+        <button id="confirmPaidBtn" class="btn">Tôi đã thanh toán</button>
+        <button id="backCart" class="btn ghost">Quay về Giỏ hàng</button>
+      </div>
+
+      <div class="note">LƯU Ý: Đây là flow demo — với cổng thật bạn phải verify giao dịch server-side trước khi lưu đơn.</div>
+    </div>
+  </div>
+
+  <script>
+    // Checkout page (client-side demo)
+    // - Reads CHECKOUT_KEY (checkoutData)
+    // - Shows items and total
+    // - "Tôi đã thanh toán" => saves order into per-user orders key (orders:user:...) with status "Đã thanh toán",
+    //   updates per-user cart (removes paid qty), clears checkoutData and redirects to orders.html
+
+    const CHECKOUT_KEY = 'checkoutData';
+    const AUTH_KEY = 'authUser';
+
+    function getAuthUser(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'null'); }catch{return null;} }
+    function getUserKey(){ const u=getAuthUser(); if(!u) return 'guest'; if(u.id) return 'user:'+u.id; if(u.email) return 'user:'+u.email.toLowerCase(); return 'user:'+ (u.name||'').replace(/\s+/g,'_').toLowerCase(); }
+    function ordersKey(){ return 'orders:' + getUserKey(); }
+    function cartKey(){ return 'cart:' + getUserKey(); }
+
+    function getCheckoutData(){ try{ return JSON.parse(localStorage.getItem(CHECKOUT_KEY)||'[]'); }catch{return [];} }
+    function getOrders(){ try{ return JSON.parse(localStorage.getItem(ordersKey())||'[]'); }catch{return [];} }
+    function setOrders(arr){ localStorage.setItem(ordersKey(), JSON.stringify(arr||[])); }
+    function getCart(){ try{ return JSON.parse(localStorage.getItem(cartKey())||'[]'); }catch{return [];} }
+    function setCart(c){ localStorage.setItem(cartKey(), JSON.stringify(c||[])); }
+
+    function formatMoney(n){ return (Number(n)||0).toLocaleString() + ' VNĐ'; }
+
+    // Render checkout summary
+    function renderCheckout() {
+      const items = getCheckoutData();
+      const list = document.getElementById('itemsList');
+      list.innerHTML = '';
+      if (!items || !items.length) {
+        list.innerHTML = '<div style="color:#666">Không có sản phẩm để thanh toán.</div>';
+        document.getElementById('totalAmount').innerText = 'Tổng tiền: 0 VNĐ';
+        document.getElementById('confirmPaidBtn').disabled = true;
+        return;
+      }
+      let total = 0;
+      items.forEach(it => {
+        const qty = Number(it.qty)||1;
+        const price = Number(it.price)||0;
+        total += qty * price;
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `<div>${escapeHtml(it.name)} × ${qty}</div><div style="font-weight:700">${formatMoney(qty*price)}</div>`;
+        list.appendChild(row);
+      });
+      document.getElementById('totalAmount').innerText = 'Tổng tiền: ' + formatMoney(total);
+      document.getElementById('confirmPaidBtn').disabled = false;
+    }
+
+    // helper escape
+    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
+
+    // Mark checkout as paid (client-side)
+    function markCheckoutAsPaid() {
+      const user = getAuthUser();
+      if (!user) {
+        alert('Vui lòng đăng nhập để lưu lịch sử thanh toán.');
+        return;
+      }
+      const checkout = getCheckoutData();
+      if (!checkout || !checkout.length) {
+        alert('Không có dữ liệu thanh toán (checkout).');
+        return;
+      }
+
+      const total = checkout.reduce((s,i) => s + (Number(i.price)||0)*(Number(i.qty)||1), 0);
+      const order = {
+        id: 'OD' + Date.now(),
+        date: new Date().toLocaleString(),
+        items: checkout,
+        total,
+        status: 'Đã thanh toán',
+        owner: user.email || user.name || ''
+      };
+
+      // save into per-user orders
+      const orders = getOrders();
+      orders.push(order);
+      setOrders(orders);
+
+      // remove paid quantities from cart (best-effort)
+      try {
+        let cart = getCart();
+        checkout.forEach(p => {
+          for (let i = 0; i < cart.length; i++) {
+            if (String(cart[i].id) === String(p.id)) {
+              const paidQty = Number(p.qty)||1;
+              const remain = (Number(cart[i].qty)||1) - paidQty;
+              if (remain > 0) cart[i].qty = remain;
+              else { cart.splice(i,1); i--; }
+              break;
+            }
+          }
+        });
+        setCart(cart);
+      } catch (e) { console.warn('Không thể cập nhật cart sau khi thanh toán', e); }
+
+      // clear checkout
+      localStorage.removeItem(CHECKOUT_KEY);
+
+      alert('Thanh toán đã được ghi nhận. Chuyển tới lịch sử đơn hàng.');
+      window.location.href = 'orders.html';
+    }
+
+    // Attach handler to button
+    document.getElementById('confirmPaidBtn').addEventListener('click', function(){
+      if (!confirm('Xác nhận bạn đã hoàn tất thanh toán?')) return;
+      markCheckoutAsPaid();
+    });
+
+    document.getElementById('backCart').addEventListener('click', ()=> window.location.href = 'cart.html');
+
+    // Init
+    renderCheckout();
+  </script>
+</body>
+</html>

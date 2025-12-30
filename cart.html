@@ -1,0 +1,495 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ Hàng | Chợ thuê đồ SV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            background: #f5f6fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+        }
+
+        .cart-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 3px 18px #e8ecef;
+            padding: 36px 40px 30px 40px;
+        }
+
+        .cart-title {
+            font-size: 27px;
+            font-weight: bold;
+            margin-bottom: 28px;
+            color: #222d3c;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 10px #f0f0f5;
+        }
+
+            .cart-table th, .cart-table td {
+                padding: 17px 10px;
+                text-align: center;
+            }
+
+            .cart-table thead th {
+                background: #f7f9fb;
+                color: #3a4661;
+                font-size: 16px;
+                font-weight: 600;
+                border-bottom: 2px solid #ebedf2;
+            }
+
+            .cart-table tbody tr {
+                border-top: 1px solid #f1f3f7;
+                transition: background 0.13s;
+            }
+
+                .cart-table tbody tr:hover {
+                    background: #f8fafc;
+                }
+
+            .cart-table .cart-thumb img {
+                width: 62px;
+                height: 84px;
+                object-fit: cover;
+                border-radius: 7px;
+                box-shadow: 0 1px 4px #e0e5ee;
+            }
+
+            .cart-table .cart-title-cell {
+                font-weight: 600;
+                color: #112240;
+                font-size: 17px;
+                text-align: left;
+            }
+
+            .cart-table .cart-price {
+                color: #1976d2;
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            .cart-table .line-total {
+                color: #da0037;
+                font-weight: 700;
+                font-size: 15px;
+            }
+
+            .cart-table .cart-remove-btn {
+                background: none;
+                border: none;
+                color: #db3241;
+                font-size: 22px;
+                cursor: pointer;
+                transition: color 0.18s;
+            }
+
+                .cart-table .cart-remove-btn:hover {
+                    color: #a2131e;
+                }
+
+            .cart-table input[type="checkbox"] {
+                transform: scale(1.3);
+                accent-color: #1976d2;
+            }
+
+        /* quantity controls */
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+            .qty-controls button {
+                width: 30px;
+                height: 30px;
+                border-radius: 6px;
+                border: 1px solid #e0e6ef;
+                background: #fff;
+                cursor: pointer;
+                font-size: 18px;
+                line-height: 1;
+            }
+
+                .qty-controls button:active {
+                    transform: translateY(1px);
+                }
+
+        .qty-input {
+            width: 56px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #e0e6ef;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .cart-summary {
+            background: #fff;
+            border-radius: 9px;
+            box-shadow: 0 1px 7px #eaebef;
+            margin-top: 28px;
+            padding: 21px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 19px;
+        }
+
+        .sum-span {
+            color: #1976d2;
+            margin: 0 6px;
+        }
+
+        .sum-price {
+            color: #da0037;
+            font-weight: bold;
+        }
+
+        .pay-btn {
+            background: #dbe3ec;
+            color: #888;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 12px 30px;
+            cursor: not-allowed;
+            transition: background 0.18s;
+        }
+
+            .pay-btn.enabled {
+                background: #1976d2;
+                color: #fff;
+                cursor: pointer;
+            }
+
+        .pay-msg {
+            margin: 24px 0 0 0;
+            background: #e3fced;
+            color: #1a7a3e;
+            border-radius: 8px;
+            padding: 16px 23px;
+            font-weight: bold;
+            font-size: 17px;
+            box-shadow: 0 2px 5px #e4eee7;
+            display: none;
+        }
+        /* Responsive */
+        @media (max-width: 640px) {
+            .cart-container {
+                padding: 10px;
+            }
+
+            .cart-table th, .cart-table td {
+                padding: 7px 3px;
+            }
+
+            .cart-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 11px;
+            }
+
+            .qty-controls {
+                gap: 4px;
+            }
+
+            .qty-input {
+                width: 46px;
+                height: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <div class="cart-title">Giỏ Hàng Của Bạn</div>
+        <table class="cart-table" id="cartTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>Ảnh Bìa</th>
+                    <th>Tên Đồ</th>
+                    <th>Giá Thuê (VNĐ)</th>
+                    <th>Số Lượng</th>
+                    <th>Thành Tiền</th>
+                    <th>Xóa</th>
+                </tr>
+            </thead>
+            <tbody id="cartBody">
+                <!-- Nội dung động -->
+            </tbody>
+        </table>
+        <div class="cart-summary">
+            <span>
+                Tổng cộng (<span class="sum-span" id="sumCount">0</span> chọn):
+                <span class="sum-price" id="sumPrice">0 VNĐ</span>
+            </span>
+            <button class="pay-btn" id="payBtn" disabled>Tiến Hành Thanh Toán</button>
+        </div>
+    </div>
+    <script>
+        // Per-user cart implementation
+        const AUTH_KEY = 'authUser';
+        const CHECKOUT_KEY = 'checkoutData'; // kept global for compatibility with orders page
+
+        function getAuthUser() {
+            try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); }
+            catch { return null; }
+        }
+        function getUserKey() {
+            const user = getAuthUser();
+            if (!user) return 'guest';
+            if (user.id) return 'user:' + String(user.id);
+            if (user.email) return 'user:' + String(user.email).toLowerCase();
+            return 'user:' + String(user.name || 'unknown').replace(/\s+/g, '_').toLowerCase();
+        }
+        function getCartStorageKey() {
+            return 'cart:' + getUserKey();
+        }
+
+        // Read/Write cart for current user
+        function getCart() {
+            try { return JSON.parse(localStorage.getItem(getCartStorageKey()) || '[]'); }
+            catch { return []; }
+        }
+        function setCart(cart) {
+            try { localStorage.setItem(getCartStorageKey(), JSON.stringify(cart || [])); }
+            catch (e) { console.error('Cannot save cart', e); }
+        }
+
+        // Merge guest cart into current user's cart (call on render)
+        function mergeGuestCartIntoUser() {
+            const guestKey = 'cart:guest';
+            const guestRaw = localStorage.getItem(guestKey);
+            if (!guestRaw) return;
+            try {
+                const guestCart = JSON.parse(guestRaw || '[]');
+                if (!Array.isArray(guestCart) || guestCart.length === 0) { localStorage.removeItem(guestKey); return; }
+                const userCart = getCart();
+                const map = new Map();
+                userCart.forEach(i => map.set(i.id, Object.assign({}, i)));
+                guestCart.forEach(i => {
+                    if (map.has(i.id)) map.get(i.id).qty = (Number(map.get(i.id).qty) || 0) + (Number(i.qty) || 0);
+                    else map.set(i.id, Object.assign({}, i));
+                });
+                const merged = Array.from(map.values());
+                setCart(merged);
+                localStorage.removeItem(guestKey);
+            } catch (e) {
+                console.warn('Cannot merge guest cart', e);
+            }
+        }
+
+        // Ensure structure and defaults
+        function ensureCartStructure() {
+            let cart = getCart();
+            cart = cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                img: item.img,
+                price: Number(isFinite(item.price) ? item.price : (item.price === 0 ? 0 : 56000)),
+                qty: Number(item.qty && item.qty > 0 ? item.qty : 1)
+            }));
+            setCart(cart);
+            return cart;
+        }
+
+        // Render table
+        function renderCartTable() {
+            // merge guest cart if logged in
+            mergeGuestCartIntoUser();
+
+            const cart = ensureCartStructure();
+            let tbody = '';
+            cart.forEach((item, idx) => {
+                const lineTotal = (Number(item.price) || 0) * (Number(item.qty) || 1);
+                tbody += `<tr>
+                            <td><input type="checkbox" class="cart-chk" data-idx="${idx}"></td>
+                            <td class="cart-thumb"><img src="${escapeHtml(item.img)}" alt=""></td>
+                            <td class="cart-title-cell">${escapeHtml(item.name)}</td>
+                            <td class="cart-price" data-price="${item.price}">${Number(item.price).toLocaleString()} VNĐ</td>
+                            <td>
+                                <div class="qty-controls">
+                                    <button class="qty-minus" data-idx="${idx}" title="Giảm">−</button>
+                                    <input type="number" class="qty-input" data-idx="${idx}" value="${item.qty}" min="1" />
+                                    <button class="qty-plus" data-idx="${idx}" title="Tăng">+</button>
+                                </div>
+                            </td>
+                            <td class="line-total" data-idx="${idx}">${lineTotal.toLocaleString()} VNĐ</td>
+                            <td><button class="cart-remove-btn" data-idx="${idx}" title="Xóa"><i class="fa fa-trash"></i></button></td>
+                        </tr>`;
+            });
+            document.getElementById('cartBody').innerHTML = (cart.length ? tbody :
+                `<tr><td colspan="7" style="padding:32px;color:#aaa;font-size:17px;text-align:center">Giỏ hàng trống</td></tr>`);
+            // reset selectAll
+            const selAll = document.getElementById('selectAll');
+            if (selAll) selAll.checked = false;
+            updateSum();
+        }
+
+        // Event handling (delegated)
+        const cartBody = document.getElementById('cartBody');
+
+        cartBody.addEventListener('click', function (e) {
+            // Remove
+            const removeBtn = e.target.closest('.cart-remove-btn');
+            if (removeBtn) {
+                const idx = +removeBtn.getAttribute('data-idx');
+                if (confirm('Bạn chắc chắn muốn xóa sản phẩm này khỏi giỏ?')) {
+                    let cart = getCart();
+                    cart.splice(idx, 1);
+                    setCart(cart);
+                    renderCartTable();
+                }
+                return;
+            }
+
+            // Plus
+            const plusBtn = e.target.closest('.qty-plus');
+            if (plusBtn) {
+                const idx = +plusBtn.getAttribute('data-idx');
+                let cart = getCart();
+                cart[idx].qty = (Number(cart[idx].qty) || 1) + 1;
+                setCart(cart);
+                const input = cartBody.querySelector(`.qty-input[data-idx="${idx}"]`);
+                if (input) input.value = cart[idx].qty;
+                updateLineTotal(idx);
+                updateSum();
+                return;
+            }
+
+            // Minus
+            const minusBtn = e.target.closest('.qty-minus');
+            if (minusBtn) {
+                const idx = +minusBtn.getAttribute('data-idx');
+                let cart = getCart();
+                cart[idx].qty = Math.max(1, (Number(cart[idx].qty) || 1) - 1);
+                setCart(cart);
+                const input = cartBody.querySelector(`.qty-input[data-idx="${idx}"]`);
+                if (input) input.value = cart[idx].qty;
+                updateLineTotal(idx);
+                updateSum();
+                return;
+            }
+        });
+
+        // change events for qty inputs and checkboxes
+        cartBody.addEventListener('change', function (e) {
+            const input = e.target.closest('.qty-input');
+            if (input) {
+                const idx = +input.getAttribute('data-idx');
+                let val = parseInt(input.value, 10);
+                if (!isFinite(val) || val < 1) val = 1;
+                let cart = getCart();
+                if (!cart[idx]) return;
+                cart[idx].qty = val;
+                setCart(cart);
+                input.value = val;
+                updateLineTotal(idx);
+                updateSum();
+                return;
+            }
+            if (e.target.classList && e.target.classList.contains('cart-chk')) {
+                syncSelectAllState();
+                updateSum();
+            }
+        });
+
+        cartBody.addEventListener('input', function (e) {
+            if (e.target.classList && e.target.classList.contains('cart-chk')) {
+                syncSelectAllState();
+                updateSum();
+            }
+        });
+
+        // Select all handling
+        document.getElementById('selectAll').addEventListener('change', function () {
+            const checked = this.checked;
+            document.querySelectorAll('.cart-chk').forEach(chk => chk.checked = checked);
+            updateSum();
+        });
+
+        function syncSelectAllState() {
+            const all = Array.from(document.querySelectorAll('.cart-chk'));
+            if (!all.length) {
+                const selAll = document.getElementById('selectAll'); if (selAll) selAll.checked = false;
+                return;
+            }
+            const allChecked = all.every(chk => chk.checked);
+            const selAll = document.getElementById('selectAll'); if (selAll) selAll.checked = allChecked;
+        }
+
+        // update line total for given idx
+        function updateLineTotal(idx) {
+            const cart = getCart();
+            const item = cart[idx];
+            const total = item ? (Number(item.price) || 0) * (Number(item.qty) || 1) : 0;
+            const cell = cartBody.querySelector(`.line-total[data-idx="${idx}"]`);
+            if (cell) cell.innerText = total.toLocaleString() + ' VNĐ';
+        }
+
+        // update summary and enable/disable pay button
+        function updateSum() {
+            const cart = getCart();
+            let sum = 0, cnt = 0;
+            const chks = document.querySelectorAll('.cart-chk');
+            chks.forEach((chk, idx) => {
+                if (chk.checked) {
+                    cnt++;
+                    const item = cart[idx];
+                    if (item) sum += (Number(item.price) || 0) * (Number(item.qty) || 1);
+                }
+            });
+            document.getElementById('sumCount').innerText = cnt;
+            document.getElementById('sumPrice').innerText = (sum ? sum.toLocaleString() : '0') + ' VNĐ';
+            const payBtn = document.getElementById('payBtn');
+            if (cnt > 0) {
+                payBtn.classList.add('enabled');
+                payBtn.disabled = false;
+            } else {
+                payBtn.classList.remove('enabled');
+                payBtn.disabled = true;
+            }
+        }
+
+        // Proceed to checkout: save selected items to CHECKOUT_KEY (global for compatibility)
+        document.getElementById('payBtn').addEventListener('click', function () {
+            if (!this.classList.contains('enabled')) return;
+            const cart = getCart();
+            const selected = [];
+            document.querySelectorAll('.cart-chk').forEach((chk, idx) => {
+                if (chk.checked && cart[idx]) {
+                    selected.push(cart[idx]);
+                }
+            });
+            if (!selected.length) return;
+            localStorage.setItem(CHECKOUT_KEY, JSON.stringify(selected));
+            // navigate to checkout.html (if exists)
+            window.location.href = 'checkout.html';
+        });
+
+        // Escape helper
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
+        }
+
+        // Initial render
+        renderCartTable();
+    </script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Quản trị | Chợ thuê đồ SV</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        :root {
+            --bg: #f1f5f9;
+            --sidebar: #112233;
+            --primary: #1976d2
+        }
+
+        body {
+            font-family: Segoe UI,Arial,sans-serif;
+            background: var(--bg);
+            margin: 0
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar);
+            color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0
+        }
+
+        .brand {
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .logout {
+            background: #e53e3e;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer
+        }
+
+        nav {
+            margin-top: 18px
+        }
+
+            nav a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: #dbe7f7;
+                text-decoration: none;
+                padding: 10px;
+                border-radius: 8px;
+                margin: 6px 0
+            }
+
+                nav a.active {
+                    background: rgba(255,255,255,0.06);
+                    color: #fff
+                }
+
+                nav a .icon {
+                    width: 20px;
+                    text-align: center
+                }
+
+        .content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 28px;
+            box-sizing: border-box
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .card-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap
+        }
+
+        .card {
+            background: #fff;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+            min-width: 160px
+        }
+
+        .section {
+            margin-top: 22px
+        }
+        /* Users table */
+        .wrap {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px
+        }
+
+        th, td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f2f4f8;
+            text-align: left
+        }
+
+        th {
+            background: #fafbff
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+            .btn.ghost {
+                background: transparent;
+                border: 1px dashed #cfe3ff;
+                color: var(--primary)
+            }
+
+            .btn.secondary {
+                background: #eef3ff;
+                color: var(--primary);
+                border: 1px solid #dbe9fb
+            }
+
+        .empty {
+            padding: 16px;
+            color: #666
+        }
+
+        .modal-back {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            max-width: 640px;
+            width: 92%
+        }
+
+        .form-inline {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 12px;
+            flex-wrap: wrap
+        }
+
+        input[type="text"], input[type="email"], select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #e6eef8
+        }
+
+        .note {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px
+        }
+
+        @media(max-width:800px) {
+            .card-row {
+                flex-direction: column
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 12px
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar" aria-label="Sidebar">
+            <div class="brand"><i class="fa fa-cube"></i> Quản trị Chợ thuê SV</div>
+            <div style="margin-bottom:12px">
+                <button class="logout" id="btnLogout">Đăng xuất</button>
+            </div>
+            <nav id="menu">
+                <a href="#" data-view="dashboard" class="active"><span class="icon">🏠</span> Bảng Điều Khiển</a>
+                <a href="#" data-view="products"><span class="icon">📦</span> Quản Lý Sản Phẩm</a>
+                <a href="#" data-view="orders"><span class="icon">🧾</span> Quản Lý Đơn Thuê</a>
+                <a href="#" data-view="users"><span class="icon">👥</span> Quản Lý Người Dùng</a>
+                <a href="#" data-view="reviews"><span class="icon">⭐</span> Quản Lý Đánh Giá</a>
+                <a href="#" data-view="reports"><span class="icon">📊</span> Báo Cáo Doanh Thu</a>
+            </nav>
+            <div style="position:absolute;bottom:18px;left:20px;color:#cbd5e1;font-size:13px">Admin Panel</div>
+        </aside>
+
+        <main class="content" role="main">
+            <div class="topbar">
+                <h1 id="pageTitle">Bảng Điều Khiển</h1>
+                <div>
+                    <button id="goHome" class="btn secondary">Về Trang Chủ</button>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <section id="view-dashboard" class="section view">
+                <div class="card-row">
+                    <div class="card">Sản phẩm<br><strong id="statProducts">0</strong></div>
+                    <div class="card">Đơn thuê<br><strong id="statOrders">0</strong></div>
+                    <div class="card">Người dùng<br><strong id="statUsers">0</strong></div>
+                    <div class="card">Doanh thu<br><strong id="statRevenue">0 VNĐ</strong></div>
+                </div>
+                <div style="margin-top:18px" class="wrap">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                        <div class="note">Sản phẩm được thuê nhiều nhất: <strong id="popularProduct">-</strong></div>
+                        <div class="note">Đơn mới tháng này: <strong id="newOrdersThisMonth">0</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products (stub) -->
+            <section id="view-products" class="section view" style="display:none">
+                <div class="wrap">
+                    <h2>Quản lý Sản phẩm</h2>
+                    <p class="note">Danh sách sản phẩm lưu trong <code>allItems</code> (localStorage). Đây là phần demo — bạn có thể mở rộng.</p>
+                    <div id="productsArea"></div>
+                </div>
+            </section>
+
+            <!-- Orders (stub) -->
+            <section id="view-orders" class="section view" style="display:none">
+                <div class="wrap">
+                    <h2>Quản lý Đơn thuê</h2>
+                    <div id="ordersArea"></div>
+                </div>
+            </section>
+
+            <!-- Users (embedded) -->
+            <section id="view-users" class="section view" style="display:none">
+                <div class="wrap">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div>
+                            <h2>Quản lý Người dùng</h2>
+                            <div class="note">Dữ liệu lưu cục bộ tại key <code>users</code> (localStorage).</div>
+                        </div>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn secondary" id="importSample">Nhập mẫu</button>
+                            <button class="btn secondary" id="clearAll">Xóa tất cả</button>
+                            <button class="btn" id="btnNew">+ Thêm người dùng</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:12px" class="form-inline">
+                        <input id="searchInp" type="text" placeholder="Tìm theo tên hoặc email" style="flex:1">
+                        <button class="btn secondary" id="btnSearch">Tìm</button>
+                    </div>
+
+                    <div id="listArea"></div>
+                </div>
+            </section>
+
+            <!-- Reviews / Reports placeholders -->
+            <section id="view-reviews" class="section view" style="display:none">
+                <div class="wrap"><h2>Quản lý Đánh giá</h2><p class="note">Chưa triển khai (demo).</p></div>
+            </section>
+
+            <section id="view-reports" class="section view" style="display:none">
+                <div class="wrap"><h2>Báo cáo Doanh thu</h2><p class="note">Chưa triển khai (demo).</p></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for user add/edit -->
+    <div class="modal-back" id="modalBack" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true">
+            <h3 id="modalTitle">Thêm người dùng</h3>
+            <div style="margin-top:8px">
+                <label>Tên</label>
+                <input id="m_name" type="text" style="width:100%">
+                <label style="margin-top:8px">Email</label>
+                <input id="m_email" type="email" style="width:100%">
+                <label style="margin-top:8px">Role</label>
+                <select id="m_role" style="width:100%;padding:8px">
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                </select>
+                <label style="margin-top:8px">Mật khẩu (demo)</label>
+                <input id="m_pass" type="text" placeholder="mật khẩu lưu cục bộ" style="width:100%">
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn secondary" id="m_cancel">Hủy</button>
+                <button class="btn" id="m_save">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Auth check (demo) ---
+        (function () {
+            const loggedIn = localStorage.getItem('loggedIn');
+            let isAdmin = false;
+            if (loggedIn && loggedIn === 'admin') isAdmin = true;
+            else {
+                try {
+                    const auth = JSON.parse(localStorage.getItem('authUser') || 'null');
+                    if (auth && auth.role === 'admin') isAdmin = true;
+                } catch (e) { }
+            }
+            if (!isAdmin) {
+                alert('Bạn không có quyền truy cập trang quản trị.');
+                window.location.href = 'index.html';
+            }
+        })();
+
+        // --- helpers for localStorage keys ---
+        const USERS_KEY = 'users';
+        function getUsers() { try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch (e) { return []; } }
+        function setUsers(v) { localStorage.setItem(USERS_KEY, JSON.stringify(v)); }
+
+        function getOrders() { try { return JSON.parse(localStorage.getItem('orders') || '[]'); } catch (e) { return []; } }
+        function getProducts() { try { return JSON.parse(localStorage.getItem('allItems') || '[]'); } catch (e) { return []; } }
+
+        function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+        function idFromTime() { return 'OD' + Date.now(); }
+        function formatMoney(n) { return (Number(n) || 0).toLocaleString() + ' VNĐ'; }
+
+        // --- navigation (single-file admin) ---
+        const menuLinks = document.querySelectorAll('#menu a');
+        function showView(name) {
+            document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+            const el = document.getElementById('view-' + name);
+            if (el) el.style.display = '';
+            document.getElementById('pageTitle').innerText = (name === 'dashboard' ? 'Bảng Điều Khiển' : (name === 'users' ? 'Quản lý Người dùng' : (name.charAt(0).toUpperCase() + name.slice(1))));
+            menuLinks.forEach(a => a.classList.toggle('active', a.dataset.view === name));
+            // call view-specific renderers
+            if (name === 'dashboard') updateStats();
+            if (name === 'users') renderUsers();
+            if (name === 'products') renderProducts();
+            if (name === 'orders') renderOrders();
+        }
+        menuLinks.forEach(a => a.addEventListener('click', (e) => {
+            e.preventDefault(); showView(a.dataset.view);
+        }));
+
+        document.getElementById('goHome').onclick = () => window.location.href = 'index.html';
+        document.getElementById('btnLogout').onclick = function () {
+            if (!confirm('Đăng xuất khỏi quản trị?')) return;
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('authUser');
+            window.location.href = 'index.html';
+        };
+
+        // --- Dashboard stats ---
+        function updateStats() {
+            const products = getProducts();
+            const orders = getOrders();
+            const users = getUsers();
+            const revenue = orders.reduce((s, o) => s + (Number(o.total) || 0), 0);
+            document.getElementById('statProducts').innerText = (products.length || 0);
+            document.getElementById('statOrders').innerText = (orders.length || 0);
+            document.getElementById('statUsers').innerText = (users.length || 0);
+            document.getElementById('statRevenue').innerText = (revenue).toLocaleString() + ' VNĐ';
+            // popular product (simple count by name)
+            const counts = {};
+            orders.forEach(o => (o.items || []).forEach(it => { counts[it.name] = (counts[it.name] || 0) + (Number(it.qty) || 1); }));
+            let popular = '-';
+            let max = 0;
+            for (const k in counts) { if (counts[k] > max) { max = counts[k]; popular = k; } }
+            document.getElementById('popularProduct').innerText = popular;
+            // orders this month
+            const thisMonth = new Date().getMonth();
+            const newThisMonth = orders.filter(o => {
+                const d = new Date(o.date || o.createdAt || o.id ?.replace(/^OD/, '') * 1 || 0);
+                return d.getMonth() === thisMonth;
+            }).length;
+            document.getElementById('newOrdersThisMonth').innerText = newThisMonth;
+        }
+
+        // --- Products (simple list) ---
+        function renderProducts() {
+            const container = document.getElementById('productsArea');
+            const arr = getProducts();
+            if (!arr.length) { container.innerHTML = '<div class="empty">Không có sản phẩm.</div>'; return; }
+            let html = '<table><thead><tr><th>Tên</th><th>Giá</th><th>Chủ</th></tr></thead><tbody>';
+            arr.forEach(it => html += `<tr><td>${escapeHtml(it.name)}</td><td>${Number(it.price || 0).toLocaleString()} VNĐ</td><td>${escapeHtml(it.author || '')}</td></tr>`);
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // --- Orders (simple) ---
+        function renderOrders() {
+            const container = document.getElementById('ordersArea');
+            const arr = getOrders();
+            if (!arr.length) { container.innerHTML = '<div class="empty">Không có đơn hàng.</div>'; return; }
+            let html = '<table><thead><tr><th>Mã</th><th>Ngày</th><th>Tổng</th><th>Trạng thái</th></tr></thead><tbody>';
+            arr.forEach(o => html += `<tr><td>${escapeHtml(o.id)}</td><td>${escapeHtml(o.date || '')}</td><td>${formatMoney(o.total)}</td><td>${escapeHtml(o.status || '')}</td></tr>`);
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // --- Users management (embedded) ---
+        const listArea = document.getElementById('listArea');
+        const modalBack = document.getElementById('modalBack');
+        const m_name = document.getElementById('m_name');
+        const m_email = document.getElementById('m_email');
+        const m_role = document.getElementById('m_role');
+        const m_pass = document.getElementById('m_pass');
+        const m_title = document.getElementById('modalTitle');
+
+        document.getElementById('btnNew').onclick = () => openModal();
+        document.getElementById('importSample').onclick = importSample;
+        document.getElementById('clearAll').onclick = () => { if (confirm('Xóa tất cả người dùng?')) { setUsers([]); renderUsers(); } };
+        document.getElementById('btnSearch').onclick = () => renderUsers(document.getElementById('searchInp').value.trim());
+        document.getElementById('searchInp').addEventListener('keydown', e => { if (e.key === 'Enter') renderUsers(e.target.value.trim()); });
+
+        function renderUsers(filter = '') {
+            const users = getUsers();
+            if (!users.length) { listArea.innerHTML = '<div class="empty">Không có người dùng.</div>'; updateStats(); return; }
+
+            let filtered = users;
+            if (filter) { const kw = filter.toLowerCase(); filtered = users.filter(u => (u.name || '').toLowerCase().includes(kw) || (u.email || '').toLowerCase().includes(kw)); }
+
+            let html = `<table><thead><tr><th>Tên</th><th>Email</th><th>Role</th><th>Hành động</th></tr></thead><tbody>`;
+            filtered.forEach(u => {
+                html += `<tr>
+            <td>${escapeHtml(u.name || '')}</td>
+            <td>${escapeHtml(u.email || '')}</td>
+            <td><span style="padding:4px 8px;border-radius:6px;background:#eef3ff;color:var(--primary);font-weight:700">${escapeHtml(u.role || 'user')}</span></td>
+            <td>
+              <button class="btn secondary" data-action="edit" data-email="${escapeHtml(u.email || '')}">Sửa</button>
+              <button class="btn" data-action="delete" data-email="${escapeHtml(u.email || '')}">Xóa</button>
+            </td>
+          </tr>`;
+            });
+            html += '</tbody></table>';
+            listArea.innerHTML = html;
+
+            // attach actions
+            listArea.querySelectorAll('button[data-action="edit"]').forEach(b => b.onclick = () => {
+                const email = b.getAttribute('data-email');
+                const u = getUsers().find(x => x.email === email);
+                if (u) openModal(u);
+            });
+            listArea.querySelectorAll('button[data-action="delete"]').forEach(b => b.onclick = () => {
+                const email = b.getAttribute('data-email');
+                if (!confirm('Bạn có chắc muốn xóa người dùng này?')) return;
+                const arr = getUsers().filter(x => x.email !== email);
+                setUsers(arr);
+                renderUsers();
+            });
+
+            updateStats();
+        }
+
+        function openModal(user) {
+            modalBack.style.display = 'flex';
+            modalBack.setAttribute('aria-hidden', 'false');
+            if (user) {
+                m_title.textContent = 'Sửa người dùng';
+                m_name.value = user.name || '';
+                m_email.value = user.email || '';
+                m_role.value = user.role || 'user';
+                m_pass.value = user.password || '';
+                modalBack.dataset.editing = user.email;
+            } else {
+                m_title.textContent = 'Thêm người dùng';
+                m_name.value = m_email.value = m_pass.value = '';
+                m_role.value = 'user';
+                modalBack.dataset.editing = '';
+            }
+        }
+
+        document.getElementById('m_cancel').onclick = () => { modalBack.style.display = 'none'; modalBack.dataset.editing = ''; };
+        document.getElementById('m_save').onclick = () => {
+            const name = m_name.value.trim();
+            const email = m_email.value.trim().toLowerCase();
+            const role = m_role.value;
+            const pass = m_pass.value || '';
+            if (!email) { alert('Email là bắt buộc'); return; }
+            let users = getUsers();
+            const editing = modalBack.dataset.editing || '';
+            if (editing) {
+                users = users.map(u => u.email === editing ? Object.assign({}, u, { name, email, role, password: pass }) : u);
+            } else {
+                if (users.some(u => u.email === email)) { alert('Email đã tồn tại'); return; }
+                users.push({ name, email, role, password: pass, createdAt: new Date().toLocaleString() });
+            }
+            setUsers(users);
+            modalBack.style.display = 'none';
+            modalBack.dataset.editing = '';
+            renderUsers();
+        };
+
+        // import sample
+        function importSample() {
+            if (!confirm('Nhập mẫu người dùng?')) return;
+            const sample = [
+                { name: 'Nguyễn Văn A', email: 'a@example.com', role: 'admin', password: 'admin123' },
+                { name: 'Trần Thị B', email: 'b@example.com', role: 'user', password: 'user123' },
+                { name: 'Lê Văn C', email: 'c@example.com', role: 'user', password: 'user123' }
+            ];
+            const users = getUsers();
+            sample.forEach(s => { if (!users.some(u => u.email === s.email)) users.push(s); });
+            setUsers(users);
+            renderUsers();
+            alert('Đã import mẫu.');
+        }
+
+        // modal close by clicking backdrop
+        modalBack.addEventListener('click', (e) => { if (e.target === modalBack) { modalBack.style.display = 'none'; modalBack.dataset.editing = ''; } });
+
+        // --- storage listener: update users list if changed in other tab (e.g. register.html) ---
+        window.addEventListener('storage', function (e) {
+            if (e.key === USERS_KEY) {
+                const active = document.querySelector('#menu a.active') ?.dataset.view;
+                if (active === 'users') renderUsers();
+                if (active === 'dashboard') updateStats();
+            }
+        });
+
+        // --- initial view ---
+        showView('dashboard'); // default
+
+        // If admin opens users view by direct anchor (optional)
+        if (location.hash) {
+            const name = location.hash.replace('#', '');
+            const valid = ['dashboard', 'products', 'orders', 'users', 'reviews', 'reports'];
+            if (valid.includes(name)) showView(name);
+        }
+    </script>
+</body>
+</html>

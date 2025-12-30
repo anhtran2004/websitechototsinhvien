@@ -1,0 +1,261 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Quản Lý Người Dùng | Admin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+        body {
+            font-family: Segoe UI,Arial,sans-serif;
+            background: #f4f7ff;
+            margin: 0;
+            padding: 18px
+        }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06)
+        }
+
+        .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+            .btn.secondary {
+                background: #eef3ff;
+                color: #1976d2;
+                border: 1px solid #dbe9fb
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px
+        }
+
+        th, td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f2f4f8;
+            text-align: left
+        }
+
+        th {
+            background: #fafbff
+        }
+
+        .form-inline {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 12px
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #e6eef8
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: #eef3ff;
+            color: #1976d2;
+            font-weight: 700
+        }
+
+        .actions button {
+            margin-right: 6px
+        }
+
+        .empty {
+            padding: 16px;
+            color: #666
+        }
+
+        .import-note {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="head">
+            <div>
+                <h2>Quản Lý Người Dùng</h2>
+                <div class="import-note">Dữ liệu lưu cục bộ tại key <code>users</code> (localStorage).</div>
+            </div>
+            <div>
+                <button class="btn" id="goAdmin">Về Dashboard</button>
+                <button class="btn secondary" id="importSample">Nhập mẫu</button>
+                <button class="btn secondary" id="clearAll">Xóa tất cả</button>
+            </div>
+        </div>
+
+        <div style="margin-top:12px">
+            <div style="display:flex;gap:8px;align-items:center">
+                <input id="searchInp" type="text" placeholder="Tìm theo tên hoặc email" style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef8">
+                <button class="btn secondary" id="btnSearch">Tìm</button>
+                <button class="btn" id="btnNew">+ Thêm người dùng</button>
+            </div>
+
+            <div id="listArea"></div>
+        </div>
+    </div>
+
+    <!-- modal small -->
+    <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:2000">
+        <div style="background:#fff;padding:16px;border-radius:8px;min-width:320px;max-width:600px">
+            <h3 id="modalTitle">Thêm người dùng</h3>
+            <div style="margin-top:8px">
+                <label>Tên</label>
+                <input id="m_name" type="text" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6eef8">
+                <label>Email</label>
+                <input id="m_email" type="text" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6eef8;margin-top:8px">
+                <label>Role</label>
+                <select id="m_role" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6eef8;margin-top:8px">
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                </select>
+                <label>Mật khẩu (demo)</label>
+                <input id="m_pass" type="text" placeholder="mật khẩu lưu cục bộ" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6eef8;margin-top:8px">
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn secondary" id="m_cancel">Hủy</button>
+                <button class="btn" id="m_save">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+  const USERS_KEY = 'users';
+  function getUsers(){ try{ return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }catch(e){return []; } }
+  function setUsers(u){ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+
+  document.getElementById('goAdmin').onclick = ()=> location.href='admin.html';
+  document.getElementById('importSample').onclick = importSample;
+  document.getElementById('clearAll').onclick = ()=> { if(confirm('Xóa tất cả người dùng?')){ setUsers([]); render(); } };
+  document.getElementById('btnNew').onclick = ()=> openModal();
+  document.getElementById('btnSearch').onclick = ()=> render(document.getElementById('searchInp').value.trim());
+  document.getElementById('searchInp').addEventListener('keydown', e=> { if(e.key==='Enter') render(e.target.value.trim()); });
+
+  function render(filter=''){
+    const list = getUsers();
+    const target = document.getElementById('listArea');
+    let filtered = list;
+    if(filter){
+      const kw = filter.toLowerCase();
+      filtered = list.filter(u => (u.name||'').toLowerCase().includes(kw) || (u.email||'').toLowerCase().includes(kw));
+    }
+    if(!filtered.length){ target.innerHTML = '<div class="empty">Không có người dùng.</div>'; return; }
+
+    let html = `<table><thead><tr><th>Tên</th><th>Email</th><th>Role</th><th>Hành động</th></tr></thead><tbody>`;
+    filtered.forEach((u, idx) => {
+      html += `<tr data-idx="${idx}">
+        <td>${escapeHtml(u.name||'')}</td>
+        <td>${escapeHtml(u.email||'')}</td>
+        <td><span class="role-badge">${escapeHtml(u.role||'user')}</span></td>
+        <td class="actions">
+          <button class="btn secondary" data-action="edit" data-email="${escapeHtml(u.email||'')}">Sửa</button>
+          <button class="btn" data-action="delete" data-email="${escapeHtml(u.email||'')}">Xóa</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    target.innerHTML = html;
+
+    // attach handlers
+    target.querySelectorAll('button[data-action="edit"]').forEach(b=>{
+      b.onclick = (e)=> {
+        const email = b.getAttribute('data-email');
+        const u = getUsers().find(x=> x.email === email);
+        if(u) openModal(u);
+      };
+    });
+    target.querySelectorAll('button[data-action="delete"]').forEach(b=>{
+      b.onclick = (e)=> {
+        const email = b.getAttribute('data-email');
+        if(!confirm('Bạn có chắc muốn xóa người dùng này?')) return;
+        const arr = getUsers().filter(x=> x.email !== email);
+        setUsers(arr);
+        render();
+      };
+    });
+  }
+
+  // modal logic: openModal(user) or open empty
+  const modal = document.getElementById('modal');
+  const m_title = document.getElementById('modalTitle');
+  function openModal(user){
+    modal.style.display = 'flex';
+    document.getElementById('m_name').value = user ? user.name || '' : '';
+    document.getElementById('m_email').value = user ? user.email || '' : '';
+    document.getElementById('m_role').value = user ? user.role || 'user' : 'user';
+    document.getElementById('m_pass').value = user ? user.password || '' : '';
+    m_title.textContent = user ? 'Sửa người dùng' : 'Thêm người dùng';
+    // store editing key on modal element
+    modal.dataset.editing = user ? user.email : '';
+  }
+  document.getElementById('m_cancel').onclick = ()=> { modal.style.display = 'none'; modal.dataset.editing = ''; };
+  document.getElementById('m_save').onclick = ()=>{
+    const name = document.getElementById('m_name').value.trim();
+    const email = document.getElementById('m_email').value.trim();
+    const role = document.getElementById('m_role').value;
+    const pass = document.getElementById('m_pass').value || '';
+    if(!email){ alert('Email là bắt buộc'); return; }
+    let users = getUsers();
+    const editing = modal.dataset.editing || '';
+    if(editing){
+      // update existing
+      users = users.map(u => u.email === editing ? Object.assign({}, u, { name, email, role, password: pass }) : u);
+    } else {
+      // avoid duplicates
+      if(users.some(u=> u.email === email)){ alert('Email đã tồn tại'); return; }
+      users.push({ name, email, role, password: pass });
+    }
+    setUsers(users);
+    modal.style.display = 'none';
+    modal.dataset.editing = '';
+    render();
+  };
+
+  function importSample(){
+    if(!confirm('Nhập mẫu người dùng? (sẽ thêm mẫu vào users hiện có)')) return;
+    const sample = [
+      { name:'Nguyễn Văn A', email:'a@example.com', role:'admin', password:'admin123' },
+      { name:'Trần Thị B', email:'b@example.com', role:'user', password:'user123' },
+      { name:'Lê Văn C', email:'c@example.com', role:'user', password:'user123' }
+    ];
+    const users = getUsers();
+    // merge without duplicates
+    sample.forEach(s => { if(!users.some(u=> u.email === s.email)) users.push(s); });
+    setUsers(users);
+    render();
+    alert('Đã import mẫu.');
+  }
+
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  // init
+  render();
+    </script>
+</body>
+</html>
